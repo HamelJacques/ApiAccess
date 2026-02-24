@@ -1,0 +1,8 @@
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net10.0\ApiAccess.csproj.AssemblyReference.cache
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net10.0\rpswa.dswa.cache.json
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net10.0\ApiAccess.GeneratedMSBuildEditorConfig.editorconfig
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net10.0\ApiAccess.AssemblyInfoInputs.cache
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net10.0\ApiAccess.AssemblyInfo.cs
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net10.0\ApiAccess.csproj.CoreCompileInputs.cache
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net10.0\ApiAccess.MvcApplicationPartsAssemblyInfo.cs
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net10.0\ApiAccess.MvcApplicationPartsAssemblyInfo.cache
