@@ -62,7 +62,7 @@ namespace ApiAccess.Controllers
         public IActionResult GetDetails(string nom)
         {
             string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
 
             using var conn = new OleDbConnection(connectionString);
             conn.Open();
