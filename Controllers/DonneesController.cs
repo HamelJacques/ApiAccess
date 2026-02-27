@@ -42,17 +42,45 @@ namespace ApiAccess.Controllers
         [HttpGet("filtre/{niveau1}")]        
         public IEnumerable<string> GetNiveau_1(string nom)
         {
+            string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
             var liste = new List<string>();
             string nomlocal = "";
             nomlocal=nom;
             int idNivo1 = 0;
-            idNivo1 = ObtenirId("tblNiveau1",nom);
+            idNivo1 = ObtenirId("tblNiveau1",nom, connectionString);
+
+            // Obtenir la liste de tous les éléments de niveau 1 pour le nom sélectionné
             return liste;
         }
 
-        private int ObtenirId(string table, string nom)
+
+/// <summary>
+/// Retourne l'Id unique d'un enregistrement selon une table
+/// </summary>
+/// <param name="table"></param>
+/// <param name="nom"></param>
+/// <param name="connectionstring"></param>
+/// <returns></returns>
+        private int ObtenirId(string table, string nom, string connectionstring)
         {
-            return 0;
+            using var conn = new OleDbConnection(connectionstring);
+            conn.Open();
+
+            string sql = "SELECT [N°] FROM " + table + " WHERE Nom = ?";
+            using var cmd = new OleDbCommand(sql, conn);
+
+            cmd.Parameters.AddWithValue("?", nom);
+
+            object? result = cmd.ExecuteScalar();
+
+            if (result != null && int.TryParse(result.ToString(), out int id))
+            {
+                return id;
+            }
+
+            return 0; // ou -1 selon ta logique
         }
 
         // -----------------------------
@@ -64,13 +92,14 @@ namespace ApiAccess.Controllers
             string connectionString =
                 @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
 
+            //int idNom = ObtenirId("tblNiveau1",nom, connectionString);
+
             using var conn = new OleDbConnection(connectionString);
+            string sql = "SELECT Nom, Adresse, Telephone, Age FROM tblNoms WHERE Nom = @nom";
             conn.Open();
 
-            string sql = "SELECT Nom, Adresse, Telephone, Age FROM tblNoms WHERE Nom = @nom";
-
             using var cmd = new OleDbCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@nom", nom);
+            cmd.Parameters.AddWithValue("@nom", nom);            
 
             using var reader = cmd.ExecuteReader();
 

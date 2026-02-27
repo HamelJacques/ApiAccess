@@ -34,3 +34,4 @@ D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net8.0-windows\refint\Api
 D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net8.0-windows\ApiAccess.pdb
 D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net8.0-windows\ApiAccess.genruntimeconfig.cache
 D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net8.0-windows\ref\ApiAccess.dll
+D:\Developpements\VsCode\ApiAccess\ApiAccess\obj\Debug\net8.0-windows\ApiAccess.sourcelink.json
