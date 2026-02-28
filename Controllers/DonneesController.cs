@@ -10,7 +10,7 @@ namespace ApiAccess.Controllers
     public class DonneesController : ControllerBase
     {
         // -----------------------------
-        // 1️⃣ Méthode existante : liste des noms
+        // 1️⃣ Méthode existante : Retourne une liste des noms
         // -----------------------------
         [HttpGet]
         public IEnumerable<string> Get()
@@ -55,7 +55,7 @@ namespace ApiAccess.Controllers
             return liste;
         }
 
-
+#region méthodes privées
 /// <summary>
 /// Retourne l'Id unique d'un enregistrement selon une table
 /// </summary>
@@ -82,7 +82,7 @@ namespace ApiAccess.Controllers
 
             return 0; // ou -1 selon ta logique
         }
-
+#endregion
         // -----------------------------
         // 2️⃣ Nouvelle méthode : détails d’un nom
         // -----------------------------
