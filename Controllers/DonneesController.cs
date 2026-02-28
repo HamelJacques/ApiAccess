@@ -15,18 +15,23 @@ namespace ApiAccess.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
+            Console.Write("Dans Get les noms" + Environment.NewLine);
             var liste = new List<string>();
 
             string connectionString =
                 @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
 
             using var conn = new OleDbConnection(connectionString);
+            Console.Write(connectionString + Environment.NewLine);
+
             conn.Open();
 
-            string sql = "SELECT Nom FROM tblNoms";
+            string sql = "SELECT Nom FROM tblNoms order by Nom";
 
             using var cmd = new OleDbCommand(sql, conn);
+            Console.Write("Après new OleDbCommand" + Environment.NewLine);
             using var reader = cmd.ExecuteReader();
+            Console.Write("Après ExecuteReader" + Environment.NewLine);
 
             while (reader.Read())
             {
@@ -42,16 +47,22 @@ namespace ApiAccess.Controllers
         [HttpGet("filtre/nom")]        
         public IEnumerable<string> GetNiveau_1(string nom)
         {
+            var liste = new List<string>();
+            Console.Write("Dans GetNiveau_1" + Environment.NewLine);
+            
             string connectionString =
                 @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-
-            var liste = new List<string>();
+            Console.Write(connectionString + Environment.NewLine);
+            
             string nomlocal = "";
             nomlocal=nom;
             int idNivo1 = 0;
-            idNivo1 = ObtenirId("tblNiveau1",nom, connectionString);
+            Console.Write(connectionString + Environment.NewLine);
+            idNivo1 = ObtenirId("tblNoms", nom, connectionString);
+            Console.Write("ObtenirId = " + idNivo1.ToString()  + Environment.NewLine);
 
             // Obtenir la liste de tous les éléments de niveau 1 pour le nom sélectionné
+            liste.Add(idNivo1.ToString());
             return liste;
         }
 
@@ -65,10 +76,15 @@ namespace ApiAccess.Controllers
 /// <returns></returns>
         private int ObtenirId(string table, string nom, string connectionstring)
         {
+            Console.Write("Dans ObtenirId" + Environment.NewLine);
+            Console.Write("table = " + table  + Environment.NewLine);
+            Console.Write("nom = " + nom  + Environment.NewLine);
+            Console.Write("connexionstring = " + connectionstring  + Environment.NewLine);
             using var conn = new OleDbConnection(connectionstring);
             conn.Open();
 
-            string sql = "SELECT [N°] FROM " + table + " WHERE Nom = ?";
+            string sql = "SELECT [Id] FROM " + table + " WHERE Nom = ?";             //" + nom + "'"
+            Console.Write(sql);
             using var cmd = new OleDbCommand(sql, conn);
 
             cmd.Parameters.AddWithValue("?", nom);
@@ -80,7 +96,7 @@ namespace ApiAccess.Controllers
                 return id;
             }
 
-            return 0; // ou -1 selon ta logique
+            return -1; // ou -1 selon ta logique
         }
 #endregion
         // -----------------------------
