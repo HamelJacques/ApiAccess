@@ -39,7 +39,7 @@ namespace ApiAccess.Controllers
         // -----------------------------
         // 2️⃣ Nouvelle méthode : FiltreNiveau 1
         // -----------------------------
-        [HttpGet("filtre/{niveau1}")]        
+        [HttpGet("filtre/nom")]        
         public IEnumerable<string> GetNiveau_1(string nom)
         {
             string connectionString =
