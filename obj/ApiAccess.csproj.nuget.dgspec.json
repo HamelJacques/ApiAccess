@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Developpements\\VsCode\\ApiAccess\\ApiAccess\\ApiAccess.csproj": {}
+    "D:\\Develop\\VsCode\\ApiAccess\\ApiAccess\\ApiAccess.csproj": {}
   },
   "projects": {
-    "D:\\Developpements\\VsCode\\ApiAccess\\ApiAccess\\ApiAccess.csproj": {
+    "D:\\Develop\\VsCode\\ApiAccess\\ApiAccess\\ApiAccess.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Developpements\\VsCode\\ApiAccess\\ApiAccess\\ApiAccess.csproj",
+        "projectUniqueName": "D:\\Develop\\VsCode\\ApiAccess\\ApiAccess\\ApiAccess.csproj",
         "projectName": "ApiAccess",
-        "projectPath": "D:\\Developpements\\VsCode\\ApiAccess\\ApiAccess\\ApiAccess.csproj",
-        "packagesPath": "C:\\Users\\Jacques\\.nuget\\packages\\",
-        "outputPath": "D:\\Developpements\\VsCode\\ApiAccess\\ApiAccess\\obj\\",
+        "projectPath": "D:\\Develop\\VsCode\\ApiAccess\\ApiAccess\\ApiAccess.csproj",
+        "packagesPath": "C:\\Users\\hamel\\.nuget\\packages\\",
+        "outputPath": "D:\\Develop\\VsCode\\ApiAccess\\ApiAccess\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Jacques\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\hamel\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
