@@ -10,6 +10,80 @@ namespace ApiAccess.Controllers
     public class DonneesController : ControllerBase
     {
         // -----------------------------
+        // Retourne une liste de noms selon le niveau demandé
+        // -----------------------------
+        [HttpGet("{niveau}")]
+public IEnumerable<string> GetNiveau(int niveau)
+{
+    Console.WriteLine($"Dans GetNiveau({niveau})");
+
+    var liste = new List<string>();
+
+    string connectionString =
+        @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
+    using var conn = new OleDbConnection(connectionString);
+    conn.Open();
+
+    // 🔥 Construire la requête selon le niveau demandé
+    string sql = niveau switch
+    {
+        0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
+        1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
+        2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
+        _ => throw new ArgumentException("Niveau invalide")
+    };
+
+    using var cmd = new OleDbCommand(sql, conn);
+    using var reader = cmd.ExecuteReader();
+
+    while (reader.Read())
+    {
+        liste.Add(reader.GetString(0));
+    }
+
+    Console.WriteLine("Résultat : " + string.Join(", ", liste));
+
+    return liste;
+}
+
+
+        // -----------------------------
+        // Retourne la liste des noms usagers
+        // -----------------------------
+        [HttpGet]
+        public IEnumerable<string> GetNivo0()
+        {
+            Console.Write("Dans GetNivo0" + Environment.NewLine);
+            var liste = new List<string>();
+
+            string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
+            using var conn = new OleDbConnection(connectionString);
+            Console.Write(connectionString + Environment.NewLine);
+
+            conn.Open();
+
+            string sql = "SELECT Nom FROM tblNoms order by Nom";
+
+            using var cmd = new OleDbCommand(sql, conn);
+            Console.Write("Après new OleDbCommand" + Environment.NewLine);
+            using var reader = cmd.ExecuteReader();
+            Console.Write("Après ExecuteReader" + Environment.NewLine);
+
+            while (reader.Read())
+            {
+                liste.Add(reader.GetString(0));
+            }
+            Console.Write("Après lecture" + Environment.NewLine);
+            Console.Write(string.Join(", ", liste));
+            
+
+            return liste;
+        }
+/*
+        // -----------------------------
         // 1️⃣ Méthode existante : Retourne une liste des noms
         // -----------------------------
         [HttpGet]
@@ -40,7 +114,7 @@ namespace ApiAccess.Controllers
 
             return liste;
         }
-        
+        */
         // -----------------------------
         // 2️⃣ Nouvelle méthode : FiltreNiveau 1
         // -----------------------------
@@ -66,6 +140,12 @@ namespace ApiAccess.Controllers
             return liste;
         }
 
+        [HttpPost("filtre/donnees")]
+        public bool ajouterDonnee(string nom)
+        {
+            Console.Write("Dans GetNiveau_1" + Environment.NewLine);
+            return false;
+        }
 #region méthodes privées
 /// <summary>
 /// Retourne l'Id unique d'un enregistrement selon une table
