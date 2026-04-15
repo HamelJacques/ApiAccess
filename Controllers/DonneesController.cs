@@ -13,39 +13,39 @@ namespace ApiAccess.Controllers
         // Retourne une liste de noms selon le niveau demandé
         // -----------------------------
         [HttpGet("{niveau}")]
-public IEnumerable<string> GetNiveau(int niveau)
-{
-    Console.WriteLine($"Dans GetNiveau({niveau})");
+        public IEnumerable<string> GetNiveau(int niveau)
+        {
+            Console.WriteLine($"Dans GetNiveau({niveau})");
 
-    var liste = new List<string>();
+            var liste = new List<string>();
 
-    string connectionString =
-        @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+            string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
 
-    using var conn = new OleDbConnection(connectionString);
-    conn.Open();
+            using var conn = new OleDbConnection(connectionString);
+            conn.Open();
 
-    // 🔥 Construire la requête selon le niveau demandé
-    string sql = niveau switch
-    {
-        0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
-        1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
-        2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
-        _ => throw new ArgumentException("Niveau invalide")
-    };
+            // 🔥 Construire la requête selon le niveau demandé
+            string sql = niveau switch
+            {
+                0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
+                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
+                _ => throw new ArgumentException("Niveau invalide")
+            };
 
-    using var cmd = new OleDbCommand(sql, conn);
-    using var reader = cmd.ExecuteReader();
+            using var cmd = new OleDbCommand(sql, conn);
+            using var reader = cmd.ExecuteReader();
 
-    while (reader.Read())
-    {
-        liste.Add(reader.GetString(0));
-    }
+            while (reader.Read())
+            {
+                liste.Add(reader.GetString(0));
+            }
 
-    Console.WriteLine("Résultat : " + string.Join(", ", liste));
+            Console.WriteLine("Résultat : " + string.Join(", ", liste));
 
-    return liste;
-}
+            return liste;
+        }
 
 
         // -----------------------------
