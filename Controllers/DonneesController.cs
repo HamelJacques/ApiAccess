@@ -13,6 +13,8 @@ namespace ApiAccess.Controllers
         public IActionResult AjouterValeur(int niveau, [FromBody] string valeur){
             Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}) VALEUR ({valeur})");
             //return Ok("Ajout réussi");
+            bool succes = false;
+            bool nompresent = false;
 
             try
             {
@@ -23,13 +25,21 @@ namespace ApiAccess.Controllers
 
                 // Exemple : insertion dans la BD
                 //Vérifier si la valeur est présente dans la table du niveau
-                bool succes = IsNomPresent(niveau, valeur);
+                nompresent = IsNomPresent(niveau, valeur);
+                if(!nompresent){
+                    // Ajouter à la table
+                    succes= !nompresent;
+                    return Ok("Ajout en développement");
+                }
+                
 
-                if (!succes)
-                Console.WriteLine($"Échec de l'ajout dans la base de données.");
+                if (succes){
+                    Console.WriteLine($"Échec de l'ajout dans la base de données.");
                     return StatusCode(500, "Échec de l'ajout dans la base de données.");
+                }
+                
 
-                return Ok("Ajout réussi");
+                
             }
             catch (Exception ex)
             {
@@ -241,6 +251,13 @@ namespace ApiAccess.Controllers
             Console.Write("COUNT =" + count + Environment.NewLine);
 
             return count >= 1;
+        }
+
+        private bool AjoutNomDansTable(int nivo, string valeur){
+            Console.Write("Dans ObtenirId" + Environment.NewLine);
+            //Console.Write("table = " + table  + Environment.NewLine);
+            //Console.Write("nom = " + nom  + Environment.NewLine);
+            return false;
         }
 
 
