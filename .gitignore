@@ -2,6 +2,10 @@
 # Build results
 bin/
 obj/
+*.dll
+*.pdb
+*.cache
+*.exe
 
 # Visual Studio
 .vs/
