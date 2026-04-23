@@ -9,6 +9,40 @@ namespace ApiAccess.Controllers
     [Route("[controller]")]
     public class DonneesController : ControllerBase
     {
+        [HttpPost("{niveau}")]
+        public IActionResult AjouterValeur(int niveau, [FromBody] string valeur){
+            Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}) VALEUR ({valeur})");
+            //return Ok("Ajout réussi");
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(valeur))
+                    return BadRequest("La valeur ne peut pas être vide.");
+
+                //Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}), valeur = {valeur}");
+
+                // Exemple : insertion dans la BD
+                //Vérifier si la valeur est présente dans la table du niveau
+                bool succes = IsNomPresent(niveau, valeur);
+
+                if (!succes)
+                Console.WriteLine($"Échec de l'ajout dans la base de données.");
+                    return StatusCode(500, "Échec de l'ajout dans la base de données.");
+
+                return Ok("Ajout réussi");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+            }
+            
+            return Ok(); // ✔️ obligatoire
+        }
+
+
+
+
+
         // -----------------------------
         // Retourne une liste de noms selon le niveau demandé
         // -----------------------------
@@ -147,13 +181,13 @@ namespace ApiAccess.Controllers
             return false;
         }
 #region méthodes privées
-/// <summary>
-/// Retourne l'Id unique d'un enregistrement selon une table
-/// </summary>
-/// <param name="table"></param>
-/// <param name="nom"></param>
-/// <param name="connectionstring"></param>
-/// <returns></returns>
+        /// <summary>
+        /// Retourne l'Id unique d'un enregistrement selon une table
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="nom"></param>
+        /// <param name="connectionstring"></param>
+        /// <returns></returns>
         private int ObtenirId(string table, string nom, string connectionstring)
         {
             Console.Write("Dans ObtenirId" + Environment.NewLine);
@@ -178,6 +212,38 @@ namespace ApiAccess.Controllers
 
             return -1; // ou -1 selon ta logique
         }
+
+        private bool IsNomPresent(int nivo, string valeur){
+            Console.Write("Dans IsNomPresent" + Environment.NewLine);
+            // 🔥 Construire la requête selon le niveau demandé
+            string sql = nivo switch
+            {
+                0 => "SELECT COUNT(Nom) FROM tblNoms WHERE Nom = '" + valeur + "'",
+                1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
+                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
+                _ => throw new ArgumentException("Niveau invalide")
+            };
+            Console.Write(sql + Environment.NewLine);
+
+            string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
+            using var conn = new OleDbConnection(connectionString);
+            conn.Open();
+            using var cmd = new OleDbCommand(sql, conn);
+            //using var reader = cmd.ExecuteReader();
+
+            var result = cmd.ExecuteScalar();
+            int count = Convert.ToInt32(result);
+
+            //string sql = "SELECT Nom FROM tblNoms order by Nom";
+            Console.Write("Après ExecuteReader" + Environment.NewLine);
+            Console.Write("COUNT =" + count + Environment.NewLine);
+
+            return false;
+        }
+
+
 #endregion
         // -----------------------------
         // 2️⃣ Nouvelle méthode : détails d’un nom
