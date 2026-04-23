@@ -240,7 +240,7 @@ namespace ApiAccess.Controllers
             Console.Write("Après ExecuteReader" + Environment.NewLine);
             Console.Write("COUNT =" + count + Environment.NewLine);
 
-            return false;
+            return count >= 1;
         }
 
 
