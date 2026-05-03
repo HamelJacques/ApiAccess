@@ -24,10 +24,19 @@ namespace ApiAccess.Controllers
                 // Exemple : insertion dans la BD
                 //Vérifier si la valeur est présente dans la table du niveau
                 bool succes = IsNomPresent(niveau, valeur);
+                //Console.WriteLine($"Success = " + succes.ToString());
+                
+                if(succes){
+                    Console.WriteLine(valeur+ " existe deja dans la base de données.");
+                    return StatusCode(10, valeur +  " existe deja dans dans la base de données.");
+                }
 
-                if (!succes)
-                Console.WriteLine($"Échec de l'ajout dans la base de données.");
+                if (!succes){
+                    // appeler la methode qui fera le insert
+
+                    Console.WriteLine($"Échec de l'ajout dans la base de données.");
                     return StatusCode(500, "Échec de l'ajout dans la base de données.");
+                }                
 
                 return Ok("Ajout réussi");
             }
@@ -240,8 +249,14 @@ namespace ApiAccess.Controllers
             Console.Write("Après ExecuteReader" + Environment.NewLine);
             Console.Write("COUNT =" + count + Environment.NewLine);
 
+            return count == 1;
+        }
+
+        #region Les INSERTS
+        private bool AjoutValeurDansTable(string latable, string lavaleur){
             return false;
         }
+        #endregion
 
 
 #endregion
