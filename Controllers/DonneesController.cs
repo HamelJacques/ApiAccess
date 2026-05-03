@@ -40,14 +40,14 @@ namespace ApiAccess.Controllers
                     return StatusCode(500, "Échec de l'ajout dans la base de données.");
                 }                
 
-                
+                return Ok(); // ✔️ obligatoire
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Erreur serveur : {ex.Message}");
             }
             
-            return Ok(); // ✔️ obligatoire
+            
         }
 
 
