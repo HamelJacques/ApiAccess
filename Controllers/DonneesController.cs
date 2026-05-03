@@ -25,8 +25,7 @@ namespace ApiAccess.Controllers
 
                 // Exemple : insertion dans la BD
                 //Vérifier si la valeur est présente dans la table du niveau
-<<<<<<< HEAD
-                bool succes = IsNomPresent(niveau, valeur);
+                succes = IsNomPresent(niveau, valeur);
                 //Console.WriteLine($"Success = " + succes.ToString());
                 
                 if(succes){
@@ -40,21 +39,6 @@ namespace ApiAccess.Controllers
                     Console.WriteLine($"Échec de l'ajout dans la base de données.");
                     return StatusCode(500, "Échec de l'ajout dans la base de données.");
                 }                
-=======
-                nompresent = IsNomPresent(niveau, valeur);
-                if(!nompresent){
-                    // Ajouter à la table
-                    succes= !nompresent;
-                    return Ok("Ajout en développement");
-                }
-                
-
-                if (succes){
-                    Console.WriteLine($"Échec de l'ajout dans la base de données.");
-                    return StatusCode(500, "Échec de l'ajout dans la base de données.");
-                }
-                
->>>>>>> 55fa20562ba118d8984ecf1ae12215c8059eb672
 
                 
             }
@@ -267,21 +251,11 @@ namespace ApiAccess.Controllers
             Console.Write("Après ExecuteReader" + Environment.NewLine);
             Console.Write("COUNT =" + count + Environment.NewLine);
 
-<<<<<<< HEAD
             return count == 1;
         }
 
         #region Les INSERTS
         private bool AjoutValeurDansTable(string latable, string lavaleur){
-=======
-            return count >= 1;
-        }
-
-        private bool AjoutNomDansTable(int nivo, string valeur){
-            Console.Write("Dans ObtenirId" + Environment.NewLine);
-            //Console.Write("table = " + table  + Environment.NewLine);
-            //Console.Write("nom = " + nom  + Environment.NewLine);
->>>>>>> 55fa20562ba118d8984ecf1ae12215c8059eb672
             return false;
         }
         #endregion
