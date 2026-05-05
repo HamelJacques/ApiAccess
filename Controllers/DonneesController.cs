@@ -28,13 +28,18 @@ namespace ApiAccess.Controllers
                 succes = IsNomPresent(niveau, valeur);
                 //Console.WriteLine($"Success = " + succes.ToString());
                 
-                if(succes){
+                if(IsNomPresent(niveau, valeur)){
                     Console.WriteLine(valeur+ " existe deja dans la base de données.");
                     return StatusCode(10, valeur +  " existe deja dans dans la base de données.");
                 }
+                else
+                {
+                    // on peut ajouter  appeler la methode qui fera le insert
+                    succes = AjoutValeurDansTable("tblNoms",valeur);
+                }
 
                 if (!succes){
-                    // appeler la methode qui fera le insert
+                    // 
 
                     Console.WriteLine($"Échec de l'ajout dans la base de données.");
                     return StatusCode(500, "Échec de l'ajout dans la base de données.");
@@ -256,8 +261,33 @@ namespace ApiAccess.Controllers
 
         #region Les INSERTS
         private bool AjoutValeurDansTable(string latable, string lavaleur){
-            return false;
-        }
+            Console.WriteLine("Dans AjoutValeurDansTable avec " + lavaleur);
+            try{
+                string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+            
+                string sql = $"INSERT INTO {latable} (Nom) VALUES (?)";
+                
+                Console.WriteLine("SQL = " + sql);
+                using var conn = new OleDbConnection(connectionString);
+                
+                conn.Open();
+                using var cmd = new OleDbCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@p1", lavaleur);
+
+                int rows = cmd.ExecuteNonQuery();
+                Console.WriteLine("Rows affected = " + rows);
+            }
+            catch(Exception ex){
+                Console.WriteLine("Erreur SQL : " + ex.Message);
+                return false;
+            }
+
+        return true;
+    }
+   
+        
+        
         #endregion
 
 
