@@ -23,7 +23,6 @@ namespace ApiAccess.Controllers
 
                 //Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}), valeur = {valeur}");
 
-                // Exemple : insertion dans la BD
                 //Vérifier si la valeur est présente dans la table du niveau
                 succes = IsNomPresent(niveau, valeur);
                 //Console.WriteLine($"Success = " + succes.ToString());
@@ -32,10 +31,17 @@ namespace ApiAccess.Controllers
                     Console.WriteLine(valeur+ " existe deja dans la base de données.");
                     return StatusCode(10, valeur +  " existe deja dans dans la base de données.");
                 }
-                else
-                {
-                    // on peut ajouter  appeler la methode qui fera le insert
-                    succes = AjoutValeurDansTable("tblNoms",valeur);
+                else// on peut ajouter  appeler la methode qui fera le insert
+                {                    
+                    if(niveau == 0){
+                        succes = AjoutValeurDansTable("tblNoms",valeur);
+                    }
+                    else{
+                        // Vérifier si 
+                        // ca prend une transaction pour lier les tables
+                        Console.WriteLine($"Dans le else.");
+                        succes = false; // en attendant la fin du développement
+                    }                    
                 }
 
                 if (!succes){
