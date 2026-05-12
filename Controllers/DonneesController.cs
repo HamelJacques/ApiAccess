@@ -288,6 +288,11 @@ namespace ApiAccess.Controllers
         #region Les INSERTS
         private bool AjoutValeurDansTable(string latable, string lavaleur){
             Console.WriteLine("Dans AjoutValeurDansTable avec " + lavaleur);
+            if(latable == "tblNoms"){
+                return AjouterDansTablerUsagers(lavaleur);
+            }
+            
+
             try{
                 string connectionString =
                 @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
@@ -311,7 +316,33 @@ namespace ApiAccess.Controllers
 
         return true;
     }
-   
+    private bool AjouterDansTablerUsagers(string lavaleur){
+        Console.WriteLine("Dans AjouterDansTablerUsagers avec " + lavaleur);
+        bool retour;
+        string latable = "tblNoms";
+        retour = true;
+        try{
+                string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+                //int dernierid = ObtenirDernierId(latable, lavaleur, connectionString);
+                string sql = $"INSERT INTO {latable} (Nom) VALUES (?)";
+                
+                Console.WriteLine("SQL = " + sql);
+                using var conn = new OleDbConnection(connectionString);
+                
+                conn.Open();
+                using var cmd = new OleDbCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@p1", lavaleur);
+
+                int rows = cmd.ExecuteNonQuery();
+                Console.WriteLine("Rows affected = " + rows);
+            }
+            catch(Exception ex){
+                Console.WriteLine("Erreur SQL : " + ex.Message);
+                return false;
+            }
+        return retour;
+    }
         
         
         #endregion
