@@ -203,6 +203,26 @@ namespace ApiAccess.Controllers
             return false;
         }
 #region méthodes privées
+        ///<summary>
+        /// Retourne le dernier Id de la table mentionn/e
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="connectionstring"></param>
+        /// <returns>Le dernier Id</returns>
+        private int ObtenirDernierId(string table, string nom, string connectionstring){
+            Console.Write("Dans ObtenirDernierId" + Environment.NewLine);
+            string sql = "SELECT MAX([Id]) FROM " + table;
+
+            using var conn = new OleDbConnection(connectionstring);
+            conn.Open();
+            using var cmd = new OleDbCommand(sql, conn);
+            object? result = cmd.ExecuteScalar();
+            if (result != null && int.TryParse(result.ToString(), out int id))
+            {
+                return id;
+            }
+            return 0;
+        }
         /// <summary>
         /// Retourne l'Id unique d'un enregistrement selon une table
         /// </summary>
