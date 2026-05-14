@@ -138,39 +138,16 @@ namespace ApiAccess.Controllers
 
             return liste;
         }
-/*
-        // -----------------------------
-        // 1️⃣ Méthode existante : Retourne une liste des noms
-        // -----------------------------
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            Console.Write("Dans Get les noms" + Environment.NewLine);
-            var liste = new List<string>();
 
-            string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-
-            using var conn = new OleDbConnection(connectionString);
-            Console.Write(connectionString + Environment.NewLine);
-
-            conn.Open();
-
-            string sql = "SELECT Nom FROM tblNoms order by Nom";
-
-            using var cmd = new OleDbCommand(sql, conn);
-            Console.Write("Après new OleDbCommand" + Environment.NewLine);
-            using var reader = cmd.ExecuteReader();
-            Console.Write("Après ExecuteReader" + Environment.NewLine);
-
-            while (reader.Read())
-            {
-                liste.Add(reader.GetString(0));
-            }
-
-            return liste;
+// -----------------------------
+// Retourne l'ID associé à un nom
+// -----------------------------
+        [HttpGet("id-par-nom/{unNom}")]
+        public int GetIdSpecifique(string unNom){
+            Console.WriteLine("Dans GetIdSpecifique pour " + unNom);
+            return 10;
         }
-        */
+        
         // -----------------------------
         // 2️⃣ Nouvelle méthode : FiltreNiveau 1
         // -----------------------------
