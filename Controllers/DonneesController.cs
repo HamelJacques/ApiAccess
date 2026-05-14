@@ -23,18 +23,29 @@ namespace ApiAccess.Controllers
 
                 //Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}), valeur = {valeur}");
 
-                // Exemple : insertion dans la BD
                 //Vérifier si la valeur est présente dans la table du niveau
                 succes = IsNomPresent(niveau, valeur);
                 //Console.WriteLine($"Success = " + succes.ToString());
                 
-                if(succes){
+                if(IsNomPresent(niveau, valeur)){
                     Console.WriteLine(valeur+ " existe deja dans la base de données.");
                     return StatusCode(10, valeur +  " existe deja dans dans la base de données.");
                 }
+                else// on peut ajouter  appeler la methode qui fera le insert
+                {                    
+                    if(niveau == 0){
+                        succes = AjoutValeurDansTable("tblNoms",valeur);
+                    }
+                    else{
+                        // Vérifier si 
+                        // ca prend une transaction pour lier les tables
+                        Console.WriteLine($"Dans le else.");
+                        succes = false; // en attendant la fin du développement
+                    }                    
+                }
 
                 if (!succes){
-                    // appeler la methode qui fera le insert
+                    // 
 
                     Console.WriteLine($"Échec de l'ajout dans la base de données.");
                     return StatusCode(500, "Échec de l'ajout dans la base de données.");
@@ -192,6 +203,26 @@ namespace ApiAccess.Controllers
             return false;
         }
 #region méthodes privées
+        ///<summary>
+        /// Retourne le dernier Id de la table mentionn/e
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="connectionstring"></param>
+        /// <returns>Le dernier Id</returns>
+        private int ObtenirDernierId(string table, string nom, string connectionstring){
+            Console.Write("Dans ObtenirDernierId" + Environment.NewLine);
+            string sql = "SELECT MAX([Id]) FROM " + table;
+
+            using var conn = new OleDbConnection(connectionstring);
+            conn.Open();
+            using var cmd = new OleDbCommand(sql, conn);
+            object? result = cmd.ExecuteScalar();
+            if (result != null && int.TryParse(result.ToString(), out int id))
+            {
+                return id;
+            }
+            return 0;
+        }
         /// <summary>
         /// Retourne l'Id unique d'un enregistrement selon une table
         /// </summary>
@@ -256,8 +287,64 @@ namespace ApiAccess.Controllers
 
         #region Les INSERTS
         private bool AjoutValeurDansTable(string latable, string lavaleur){
-            return false;
-        }
+            Console.WriteLine("Dans AjoutValeurDansTable avec " + lavaleur);
+            if(latable == "tblNoms"){
+                return AjouterDansTablerUsagers(lavaleur);
+            }
+            
+
+            try{
+                string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+            
+                string sql = $"INSERT INTO {latable} (Nom) VALUES (?)";
+                
+                Console.WriteLine("SQL = " + sql);
+                using var conn = new OleDbConnection(connectionString);
+                
+                conn.Open();
+                using var cmd = new OleDbCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@p1", lavaleur);
+
+                int rows = cmd.ExecuteNonQuery();
+                Console.WriteLine("Rows affected = " + rows);
+            }
+            catch(Exception ex){
+                Console.WriteLine("Erreur SQL : " + ex.Message);
+                return false;
+            }
+
+        return true;
+    }
+    private bool AjouterDansTablerUsagers(string lavaleur){
+        Console.WriteLine("Dans AjouterDansTablerUsagers avec " + lavaleur);
+        bool retour;
+        string latable = "tblNoms";
+        retour = true;
+        try{
+                string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+                //int dernierid = ObtenirDernierId(latable, lavaleur, connectionString);
+                string sql = $"INSERT INTO {latable} (Nom) VALUES (?)";
+                
+                Console.WriteLine("SQL = " + sql);
+                using var conn = new OleDbConnection(connectionString);
+                
+                conn.Open();
+                using var cmd = new OleDbCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@p1", lavaleur);
+
+                int rows = cmd.ExecuteNonQuery();
+                Console.WriteLine("Rows affected = " + rows);
+            }
+            catch(Exception ex){
+                Console.WriteLine("Erreur SQL : " + ex.Message);
+                return false;
+            }
+        return retour;
+    }
+        
+        
         #endregion
 
 

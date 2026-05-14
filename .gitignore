@@ -20,3 +20,7 @@ obj/
 # NuGet
 *.nupkg
 packages/
+
+# Access database
+*.accdb
+*.laccdb
