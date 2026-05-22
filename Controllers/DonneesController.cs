@@ -142,9 +142,17 @@ namespace ApiAccess.Controllers
 // -----------------------------
 // Retourne l'ID associé à un nom
 // -----------------------------
-        [HttpGet("id-par-nom/{unNom}")]
-        public int GetIdSpecifique(string unNom){
-            Console.WriteLine("Dans GetIdSpecifique pour " + unNom);
+        [HttpGet("id-par-nom/{unNom}/{niveau}")]
+        public int GetIdSpecifique(string unNom, int niveau){
+            Console.WriteLine("Dans GetIdSpecifique pour " + unNom + " Niveau " + niveau);
+            // ici, je veux lire la bd et obtenir l'ID de unNom
+            string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
+            int leniveau = 0;
+            leniveau = ObtenirId("tblNoms",unNom,connectionString);
+            Console.WriteLine("L'id' est " + leniveau);
+
             return 10;
         }
         
