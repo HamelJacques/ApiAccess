@@ -22,10 +22,29 @@ namespace ApiAccess.Controllers
                     return BadRequest("La valeur ne peut pas être vide.");
 
                 //Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}), valeur = {valeur}");
-
                 //Vérifier si la valeur est présente dans la table du niveau
-                succes = IsNomPresent(niveau, valeur);
+                //nompresent = IsNomPresent(niveau, valeur);
+
+                // sélection du niveau d'ajout
+                if(niveau == 0){
+                    if!(IsNomPresent(niveau, valeur)){
+                        //je l'ajoute à la table nom
+                        succes = AjoutValeurDansTable("tblNoms",valeur);
+                    }
+                    else{
+                        return StatusCode(10, valeur +  " existe deja dans dans la base de données.");
+                    }
+                }
+                else{ // Niveau 1, 2, ou 3
+                //private bool AjoutValeurDansTable(string latable, string lavaleur){
+                succes = AjoutValeurDansTable("tblNiveau" + Niveau.ToString(),valeur);
+
+                }
+
+
+                
                 //Console.WriteLine($"Success = " + succes.ToString());
+                
                 
                 if(IsNomPresent(niveau, valeur)){
                     Console.WriteLine(valeur+ " existe deja dans la base de données.");
@@ -34,7 +53,7 @@ namespace ApiAccess.Controllers
                 else// on peut ajouter  appeler la methode qui fera le insert
                 {                    
                     if(niveau == 0){
-                        succes = AjoutValeurDansTable("tblNoms",valeur);
+                       // succes = AjoutValeurDansTable("tblNoms",valeur);
                     }
                     else{
                         // Vérifier si 
@@ -89,6 +108,7 @@ namespace ApiAccess.Controllers
                 2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
+            Console.WriteLine($"SQL = {sql}");
 
             using var cmd = new OleDbCommand(sql, conn);
             using var reader = cmd.ExecuteReader();
@@ -269,18 +289,94 @@ namespace ApiAccess.Controllers
 
             return count == 1;
         }
+        private string ObtenirNomTableParNiveau(int niveau){
+            string table = niveau switch
+            {
+                0 => "tblNoms",
+                1 => "tblNiveau1",
+                2 => "tblNiveau2",
+                3 => "tblNiveau3",
+                _ => throw new ArgumentException("Niveau invalide")
+            };
+        }
+        private string ObtenirNomTableLienParNiveau(int niveau){
+            string table = niveau switch
+            {
+                1 => "jctNoms_Niveau_1",
+                2 => "jctNoms_Niveau_1",
+                3 => "jctNoms_Niveau_1",
+                _ => throw new ArgumentException("Niveau invalide")
+            };
+        }
 
         #region Les INSERTS
+        private bool AjoutValeurDansTable(int niveau, string lavaleur){
+            string latable;
+            string leLien;
+            string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
+            if(niveau == 0){
+                return AjouterDansTablerUsagers(lavaleur);
+            }
+
+            latable = ObtenirNomTableParNiveau(niveau);
+            leLien = ObtenirNomTableLienParNiveau(niveau);
+
+            using var transaction = conn.BeginTransaction();
+
+            try
+            {
+                if!(IsNomPresent(niveau, lavaleur)){
+                    // obtenir le dernier id du lien ajouter 1
+                    int idLien = ObtenirDernierId(leLien, "", connectionString);
+                }
+                else{
+                    // obtenir le dernier id du lien
+                }
+
+                int parentId;
+
+                // INSERT parent
+                using (var cmd1 = new OleDbCommand("INSERT INTO " + latable + " (Nom) VALUES (?)", conn, transaction))
+                {
+                    cmd1.Parameters.AddWithValue("@p1", nomParent);
+                    cmd1.ExecuteNonQuery();
+
+                    cmd1.CommandText = "SELECT @@IDENTITY";
+                    parentId = Convert.ToInt32(cmd1.ExecuteScalar());
+                }
+
+                // INSERT enfant
+                using (var cmd2 = new OleDbCommand("INSERT INTO tblEnfant (ParentID, Valeur) VALUES (?, ?)", conn, transaction))
+                {
+                    cmd2.Parameters.AddWithValue("@p1", parentId);
+                    cmd2.Parameters.AddWithValue("@p2", valeur);
+                    cmd2.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                Console.WriteLine("Erreur transaction : " + ex.Message);
+                return false;
+            }
+        }
+
         private bool AjoutValeurDansTable(string latable, string lavaleur){
             Console.WriteLine("Dans AjoutValeurDansTable avec " + lavaleur);
             if(latable == "tblNoms"){
                 return AjouterDansTablerUsagers(lavaleur);
-            }
-            
+            }           
 
             try{
                 string connectionString =
                 @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
+                // Ouvrir une transaction
             
                 string sql = $"INSERT INTO {latable} (Nom) VALUES (?)";
                 
