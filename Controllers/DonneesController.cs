@@ -26,6 +26,7 @@ namespace ApiAccess.Controllers
                 //nompresent = IsNomPresent(niveau, valeur);
 
                 // sélection du niveau d'ajout
+                /*
                 if(niveau == 0){
                     if!(IsNomPresent(niveau, valeur)){
                         //je l'ajoute à la table nom
@@ -41,7 +42,7 @@ namespace ApiAccess.Controllers
 
                 }
 
-
+*/
                 
                 //Console.WriteLine($"Success = " + succes.ToString());
                 
@@ -53,7 +54,7 @@ namespace ApiAccess.Controllers
                 else// on peut ajouter  appeler la methode qui fera le insert
                 {                    
                     if(niveau == 0){
-                       // succes = AjoutValeurDansTable("tblNoms",valeur);
+                       succes = AjoutValeurDansTable("tblNoms",valeur);
                     }
                     else{
                         // Vérifier si 
@@ -173,7 +174,7 @@ namespace ApiAccess.Controllers
             leniveau = ObtenirId("tblNoms",unNom,connectionString);
             Console.WriteLine("L'id' est " + leniveau);
 
-            return 10;
+            return leniveau;
         }
         
         // -----------------------------
@@ -290,6 +291,7 @@ namespace ApiAccess.Controllers
             return count == 1;
         }
         private string ObtenirNomTableParNiveau(int niveau){
+            /*
             string table = niveau switch
             {
                 0 => "tblNoms",
@@ -298,6 +300,8 @@ namespace ApiAccess.Controllers
                 3 => "tblNiveau3",
                 _ => throw new ArgumentException("Niveau invalide")
             };
+            */
+            return "";
         }
         private string ObtenirNomTableLienParNiveau(int niveau){
             string table = niveau switch
@@ -307,6 +311,7 @@ namespace ApiAccess.Controllers
                 3 => "jctNoms_Niveau_1",
                 _ => throw new ArgumentException("Niveau invalide")
             };
+            return "";
         }
 
         #region Les INSERTS
@@ -322,12 +327,13 @@ namespace ApiAccess.Controllers
 
             latable = ObtenirNomTableParNiveau(niveau);
             leLien = ObtenirNomTableLienParNiveau(niveau);
-
+            OleDbConnection conn = new OleDbConnection(connectionString);
+            conn.Open();
             using var transaction = conn.BeginTransaction();
 
             try
             {
-                if!(IsNomPresent(niveau, lavaleur)){
+                if(!IsNomPresent(niveau, lavaleur)){
                     // obtenir le dernier id du lien ajouter 1
                     int idLien = ObtenirDernierId(leLien, "", connectionString);
                 }
@@ -340,7 +346,7 @@ namespace ApiAccess.Controllers
                 // INSERT parent
                 using (var cmd1 = new OleDbCommand("INSERT INTO " + latable + " (Nom) VALUES (?)", conn, transaction))
                 {
-                    cmd1.Parameters.AddWithValue("@p1", nomParent);
+                   cmd1.Parameters.AddWithValue("@p1", leLien = ObtenirNomTableLienParNiveau(niveau));
                     cmd1.ExecuteNonQuery();
 
                     cmd1.CommandText = "SELECT @@IDENTITY";
@@ -351,7 +357,7 @@ namespace ApiAccess.Controllers
                 using (var cmd2 = new OleDbCommand("INSERT INTO tblEnfant (ParentID, Valeur) VALUES (?, ?)", conn, transaction))
                 {
                     cmd2.Parameters.AddWithValue("@p1", parentId);
-                    cmd2.Parameters.AddWithValue("@p2", valeur);
+                    cmd2.Parameters.AddWithValue("@p2", lavaleur);
                     cmd2.ExecuteNonQuery();
                 }
 
