@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data.OleDb;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Text.Json;
+
 
 namespace ApiAccess.Controllers
 {
@@ -9,6 +11,24 @@ namespace ApiAccess.Controllers
     [Route("[controller]")]
     public class DonneesController : ControllerBase
     {
+        [HttpPost("ajout")]
+        public IActionResult AjouterValeur([FromBody] AjoutRequest req)
+        {
+            var personne = req.Personne;
+            var valeur = req.Valeur;
+
+            Console.WriteLine("=== PERSONNE REÇUE ===");
+            Console.WriteLine(JsonSerializer.Serialize(personne));
+            Console.WriteLine("======================");
+
+            Console.WriteLine("Valeur reçue : " + valeur);
+
+            // traitement...
+
+            return Ok("En développement !!!");
+            //return Ok("Ajout réussi");
+        }
+
         [HttpPost("{niveau}")]
         public IActionResult AjouterValeur(int niveau, [FromBody] string valeur){
             Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}) VALEUR ({valeur})");
