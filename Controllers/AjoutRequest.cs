@@ -5,5 +5,6 @@ namespace ApiAccess.Controllers
     {
         public required Personne Personne { get; set; }
         public required string Valeur { get; set; }
+        public required int AjouPourNiveau { get; set; }
     }
 }

@@ -16,12 +16,15 @@ namespace ApiAccess.Controllers
         {
             var personne = req.Personne;
             var valeur = req.Valeur;
+            var ajoutpourniveau = req.AjouPourNiveau;
+            
 
             Console.WriteLine("=== PERSONNE REÇUE ===");
             Console.WriteLine(JsonSerializer.Serialize(personne));
             Console.WriteLine("======================");
 
             Console.WriteLine("Valeur reçue : " + valeur);
+            Console.WriteLine("AjouPourNiveau : " + ajoutpourniveau);
 
             // traitement...
 
