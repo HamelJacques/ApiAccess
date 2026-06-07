@@ -3,6 +3,7 @@ using System.Data.OleDb;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Text.Json;
+using ApiAccess.Models;
 
 
 namespace ApiAccess.Controllers
@@ -27,6 +28,7 @@ namespace ApiAccess.Controllers
             Console.WriteLine("AjouPourNiveau : " + ajoutpourniveau);
 
             // traitement...
+            bool ajoutOk =  this.AjoutValeurDansTable(ajoutpourniveau,valeur, personne);
 
             return Ok("En développement !!!");
             //return Ok("Ajout réussi");
@@ -338,7 +340,8 @@ namespace ApiAccess.Controllers
         }
 
         #region Les INSERTS
-        private bool AjoutValeurDansTable(int niveau, string lavaleur){
+        private bool AjoutValeurDansTable(int niveau, string lavaleur, Personne lapersonne){
+            Console.WriteLine("=== Dans AjoutValeurDansTable ===");
             string latable;
             string leLien;
             string connectionString =
@@ -370,7 +373,7 @@ namespace ApiAccess.Controllers
                 using (var cmd1 = new OleDbCommand("INSERT INTO " + latable + " (Nom) VALUES (?)", conn, transaction))
                 {
                    cmd1.Parameters.AddWithValue("@p1", leLien = ObtenirNomTableLienParNiveau(niveau));
-                    cmd1.ExecuteNonQuery();
+                    //cmd1.ExecuteNonQuery();
 
                     cmd1.CommandText = "SELECT @@IDENTITY";
                     parentId = Convert.ToInt32(cmd1.ExecuteScalar());
@@ -381,7 +384,7 @@ namespace ApiAccess.Controllers
                 {
                     cmd2.Parameters.AddWithValue("@p1", parentId);
                     cmd2.Parameters.AddWithValue("@p2", lavaleur);
-                    cmd2.ExecuteNonQuery();
+                    //cmd2.ExecuteNonQuery();
                 }
 
                 transaction.Commit();
@@ -390,7 +393,7 @@ namespace ApiAccess.Controllers
             catch (Exception ex)
             {
                 transaction.Rollback();
-                Console.WriteLine("Erreur transaction : " + ex.Message);
+                Console.WriteLine("Erreur transaction ajout : " + ex.Message);
                 return false;
             }
         }
