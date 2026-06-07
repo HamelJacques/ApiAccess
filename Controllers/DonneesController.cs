@@ -348,9 +348,14 @@ namespace ApiAccess.Controllers
                 @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
 
             if(niveau == 0){
+                if( IsNomPresent(niveau, lavaleur))
+                {
+                    return false;
+                }
                 return AjouterDansTablerUsagers(lavaleur);
             }
 
+            // les niveaux 1, 2 et 3
             latable = ObtenirNomTableParNiveau(niveau);
             leLien = ObtenirNomTableLienParNiveau(niveau);
             OleDbConnection conn = new OleDbConnection(connectionString);
