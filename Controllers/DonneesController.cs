@@ -130,8 +130,8 @@ namespace ApiAccess.Controllers
             string sql = niveau switch
             {
                 0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
-                1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
-                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNiveau_1 ORDER BY Nom",
+                2 => "SELECT Nom FROM tblNiveau_2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             Console.WriteLine($"SQL = {sql}");
@@ -244,14 +244,18 @@ namespace ApiAccess.Controllers
             Console.Write("Dans ObtenirDernierId" + Environment.NewLine);
             string sql = "SELECT MAX([Id]) FROM " + table;
 
+            Console.Write("sql = " + sql + Environment.NewLine);
+
             using var conn = new OleDbConnection(connectionstring);
             conn.Open();
             using var cmd = new OleDbCommand(sql, conn);
             object? result = cmd.ExecuteScalar();
             if (result != null && int.TryParse(result.ToString(), out int id))
             {
+                Console.Write("id = " + id + Environment.NewLine);
                 return id;
             }
+            Console.Write("id = 0" + Environment.NewLine);
             return 0;
         }
         /// <summary>
@@ -292,8 +296,8 @@ namespace ApiAccess.Controllers
             string sql = nivo switch
             {
                 0 => "SELECT COUNT(Nom) FROM tblNoms WHERE Nom = '" + valeur + "'",
-                1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
-                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNiveau_1 ORDER BY Nom",
+                2 => "SELECT Nom FROM tblNiveau_2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             Console.Write(sql + Environment.NewLine);
@@ -316,17 +320,17 @@ namespace ApiAccess.Controllers
             return count == 1;
         }
         private string ObtenirNomTableParNiveau(int niveau){
-            /*
+            Console.WriteLine("=== Dans ObtenirNomTableParNiveau === POUR LE NIVEAU " + niveau);
             string table = niveau switch
             {
                 0 => "tblNoms",
-                1 => "tblNiveau1",
-                2 => "tblNiveau2",
-                3 => "tblNiveau3",
+                1 => "tblNiveau_1",
+                2 => "tblNiveau_2",
+                3 => "tblNiveau_3",
                 _ => throw new ArgumentException("Niveau invalide")
             };
-            */
-            return "";
+            
+            return table;
         }
         private string ObtenirNomTableLienParNiveau(int niveau){
             string table = niveau switch
@@ -336,7 +340,7 @@ namespace ApiAccess.Controllers
                 3 => "jctNoms_Niveau_1",
                 _ => throw new ArgumentException("Niveau invalide")
             };
-            return "";
+            return table;
         }
 
         #region Les INSERTS
@@ -346,6 +350,8 @@ namespace ApiAccess.Controllers
             string leLien;
             string connectionString =
                 @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
+            Console.WriteLine("niveau =" + niveau);
 
             if(niveau == 0){
                 if( IsNomPresent(niveau, lavaleur))
@@ -358,6 +364,11 @@ namespace ApiAccess.Controllers
             // les niveaux 1, 2 et 3
             latable = ObtenirNomTableParNiveau(niveau);
             leLien = ObtenirNomTableLienParNiveau(niveau);
+
+            
+            Console.WriteLine("latable =" + latable);
+            Console.WriteLine("leLien =" + leLien);
+
             OleDbConnection conn = new OleDbConnection(connectionString);
             conn.Open();
             using var transaction = conn.BeginTransaction();
@@ -366,12 +377,12 @@ namespace ApiAccess.Controllers
             {
                 if(!IsNomPresent(niveau, lavaleur)){
                     // obtenir le dernier id du lien ajouter 1
-                    int idLien = ObtenirDernierId(leLien, "", connectionString);
+                    int idTable = ObtenirDernierId(latable, "", connectionString);
                 }
                 else{
                     // obtenir le dernier id du lien
                 }
-
+/*
                 int parentId;
 
                 // INSERT parent
@@ -393,6 +404,7 @@ namespace ApiAccess.Controllers
                 }
 
                 transaction.Commit();
+                */
                 return true;
             }
             catch (Exception ex)
