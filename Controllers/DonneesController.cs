@@ -355,7 +355,7 @@ namespace ApiAccess.Controllers
             string connectionString =
                 @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
 
-            Console.WriteLine("niveau =" + niveau);
+            Console.WriteLine("niveau =" + niveau);            
 
             if(niveau == 0){
                 if( IsNomPresent(niveau, lavaleur))
@@ -369,14 +369,12 @@ namespace ApiAccess.Controllers
             latable = ObtenirNomTableParNiveau(niveau);
             leLien = ObtenirNomTableLienParNiveau(niveau);
 
-            
-            Console.WriteLine("latable =" + latable);
-            Console.WriteLine("leLien =" + leLien);
-
+            Console.WriteLine("L'Ajout sera dans la table =" + latable);
+            Console.WriteLine("La table de lisaison sera  =" + leLien);
             OleDbConnection conn = new OleDbConnection(connectionString);
             conn.Open();
             using var transaction = conn.BeginTransaction();
-
+            
             try
             {
                 if(!IsNomPresent(niveau, lavaleur)){
@@ -384,9 +382,12 @@ namespace ApiAccess.Controllers
                     int idTable = ObtenirDernierId(latable, "", connectionString);
                     // Id == 0, pas dans la table et en plus la table est vide.  On ajoute lavaleur à la table
                 }
-                else{
+                else{ //Le nom existe j'ai besoin de son Id
                     // obtenir le dernier id du lien
                 }
+
+                
+
 /*
                 int parentId;
 
