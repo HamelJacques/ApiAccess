@@ -197,7 +197,7 @@ namespace ApiAccess.Controllers
 
             int leniveau = 0;
             leniveau = ObtenirId("tblNoms",unNom,connectionString);
-            Console.WriteLine("L'id' est " + leniveau);
+            Console.WriteLine("  L'id' est " + leniveau);
 
             return leniveau;
         }
@@ -268,13 +268,17 @@ namespace ApiAccess.Controllers
         private int ObtenirId(string table, string nom, string connectionstring)
         {
             Console.Write("Dans ObtenirId" + Environment.NewLine);
-            Console.Write("table = " + table  + Environment.NewLine);
-            Console.Write("nom = " + nom  + Environment.NewLine);
-            Console.Write("connexionstring = " + connectionstring  + Environment.NewLine);
+            Console.Write("table = " + table+ "; nom = " + nom  + Environment.NewLine);
+            //Console.Write("nom = " + nom  + Environment.NewLine);
+            //Console.Write("connexionstring = " + connectionstring  + Environment.NewLine);
             using var conn = new OleDbConnection(connectionstring);
             conn.Open();
 
-            string sql = "SELECT [Id] FROM " + table + " WHERE Nom = ?";             //" + nom + "'"
+            string sql = "SELECT [Id] FROM " + table + " WHERE Nom = ?";   
+            
+            // Affichage pour debug
+            Console.WriteLine("SQL (debug) = SELECT [Id] FROM " + table + " WHERE Nom = '" + nom + "'");
+              //" + nom + "'"
             Console.Write(sql);
             using var cmd = new OleDbCommand(sql, conn);
 
@@ -296,7 +300,7 @@ namespace ApiAccess.Controllers
             string sql = nivo switch
             {
                 0 => "SELECT COUNT(Nom) FROM tblNoms WHERE Nom = '" + valeur + "'",
-                1 => "SELECT Nom FROM tblNiveau_1 ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNiveau_1 WHERE Nom = '" + valeur + "'" + " ORDER BY Nom",
                 2 => "SELECT Nom FROM tblNiveau_2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
@@ -378,6 +382,7 @@ namespace ApiAccess.Controllers
                 if(!IsNomPresent(niveau, lavaleur)){
                     // obtenir le dernier id du lien ajouter 1
                     int idTable = ObtenirDernierId(latable, "", connectionString);
+                    // Id == 0, pas dans la table et en plus la table est vide.  On ajoute lavaleur à la table
                 }
                 else{
                     // obtenir le dernier id du lien
