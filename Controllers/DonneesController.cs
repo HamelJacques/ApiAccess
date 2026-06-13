@@ -379,10 +379,13 @@ namespace ApiAccess.Controllers
             {
                 if(!IsNomPresent(niveau, lavaleur)){
                     // obtenir le dernier id du lien ajouter 1
-                    int idTable = ObtenirDernierId(latable, "", connectionString);
+                    int idTable = ObtenirDernierId(latable, "", connectionString) + 1;
+                    Console.WriteLine("=== Id pour la nouvele valeur " + lavaleur + " est " + idTable);
                     // Id == 0, pas dans la table et en plus la table est vide.  On ajoute lavaleur à la table
                 }
                 else{ //Le nom existe j'ai besoin de son Id
+                    int idNom = ObtenirId(latable,lavaleur, connectionString);
+                    Console.WriteLine("=== Id pour la nouvele valeur " + lavaleur + " est " + idNom);
                     // obtenir le dernier id du lien
                 }
 
