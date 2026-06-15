@@ -369,8 +369,9 @@ namespace ApiAccess.Controllers
             latable = ObtenirNomTableParNiveau(niveau);
             leLien = ObtenirNomTableLienParNiveau(niveau);
 
-            Console.WriteLine("L'Ajout sera dans la table =" + latable);
-            Console.WriteLine("La table de lisaison sera  =" + leLien);
+            Console.WriteLine("L'Ajout sera dans la table = " + latable);
+            Console.WriteLine("La table de lisaison sera  = " + leLien);
+            Console.WriteLine("Niveau_0  = " + lapersonne.Niveau0 + "; Niveau_1 = " + lapersonne .Niveau1+ "; Niveau_2 = " + lapersonne .Niveau2+ "; Niveau_3 = " + lapersonne .Niveau3);
             OleDbConnection conn = new OleDbConnection(connectionString);
             conn.Open();
             using var transaction = conn.BeginTransaction();
@@ -378,14 +379,22 @@ namespace ApiAccess.Controllers
             try
             {
                 if(!IsNomPresent(niveau, lavaleur)){
+                    Console.WriteLine("=== IsNomPresent est faux");
                     // obtenir le dernier id du lien ajouter 1
-                    int idTable = ObtenirDernierId(latable, "", connectionString) + 1;
-                    Console.WriteLine("=== Id pour la nouvele valeur " + lavaleur + " est " + idTable);
-                    // Id == 0, pas dans la table et en plus la table est vide.  On ajoute lavaleur à la table
+                    int IdRef = ObtenirDernierId(latable, "", connectionString) + 1;
+                    Console.WriteLine("=== Id pour la nouvele valeur " + lavaleur + " est " + IdRef);
+                    // Id == 0, pas dans la table et en plus la table est vide.  
+                    // On ajoute lavaleur à la table
+                    string sqlInsertB = "INSERT INTO " + latable + " (idTable, Nom) VALUES (?, ?)";
+                    Console.WriteLine(sqlInsertB);
+                    //bool ajoutOk = AjoutValeurDansTable(latable, Id, lavaleur );
+                    // puis on ajoute les 2 id dans latable de liaison
+                 //   ajoutOk = AjoutIdsDansTableLiaison(leLien,IdRef,lapersonne, niveau); // méthode à créer 
                 }
                 else{ //Le nom existe j'ai besoin de son Id
+                Console.WriteLine("=== Dans le else de IsNomPresent");
                     int idNom = ObtenirId(latable,lavaleur, connectionString);
-                    Console.WriteLine("=== Id pour la nouvele valeur " + lavaleur + " est " + idNom);
+                    Console.WriteLine("=== Id pour la nouvelle valeur " + lavaleur + " est " + idNom);
                     // obtenir le dernier id du lien
                 }
 
@@ -423,6 +432,36 @@ namespace ApiAccess.Controllers
                 return false;
             }
         }
+
+        private bool AjoutValeurDansTable(string latable, int leID, string lavaleur){
+            Console.WriteLine("Dans AjoutValeurDansTable avec " + leID + " , " + lavaleur);
+            
+            try{
+                string connectionString =
+                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
+
+                // Ouvrir une transaction
+            
+                string sql = $"INSERT INTO {latable} (Id, Nom) VALUES (?, ?)";
+                
+                Console.WriteLine("SQL = " + sql);
+                using var conn = new OleDbConnection(connectionString);
+                
+                conn.Open();
+                using var cmd = new OleDbCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@p1", leID);
+                cmd.Parameters.AddWithValue("@p2", lavaleur);
+
+                int rows = cmd.ExecuteNonQuery();
+                Console.WriteLine("Rows affected = " + rows);
+            }
+            catch(Exception ex){
+                Console.WriteLine("Erreur SQL : " + ex.Message);
+                return false;
+            }
+
+        return true;
+    }
 
         private bool AjoutValeurDansTable(string latable, string lavaleur){
             Console.WriteLine("Dans AjoutValeurDansTable avec " + lavaleur);
