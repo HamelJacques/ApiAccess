@@ -393,6 +393,7 @@ namespace ApiAccess.Controllers
                     int IdRef = ObtenirDernierId(latableRef, "", connectionString) + 1;
                     Console.WriteLine("=== Id pour la nouvelle valeur " + lavaleur + " est " + IdRef);
                     // Id == 0, pas dans la table et en plus la table est vide.  
+
                     // On ajoute lavaleur à la table
                     string sqlInsertB = "INSERT INTO " + latableRef + " (idTable, Nom) VALUES (?, ?)";
                     Console.WriteLine(sqlInsertB);
@@ -404,6 +405,7 @@ namespace ApiAccess.Controllers
                     Console.WriteLine("=== Dans le else de !IsNomPresent de AjoutValeurDansTable()");
                     Console.WriteLine("=== La valeur est présente, on ajoutera simplement les liens dans la tble de liaison");
                     int idNom = ObtenirId(latableRef,lavaleur, connectionString);
+
                     //Console.WriteLine("=== Id pour la nouvelle valeur " + lavaleur + " est " + idNom);
                     // obtenir le dernier id du lien
                 }
@@ -449,6 +451,8 @@ namespace ApiAccess.Controllers
             // on écrira le Idref (IdNom) et le Personne.idpersonne
             try
             {
+                Console.WriteLine("La table : " + leLien  + ", Id Niveau 0 :" + lapersonne.Niveau0 + ", IdRef :" + idRef);
+                // créer le insert ici
                 return true;
             }
             catch(Exception ex){
