@@ -10,6 +10,8 @@ namespace ApiAccess.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+
+    #region CONSTRUCTEUR
     public class DonneesController : ControllerBase
     {
         // 1️⃣ Déclaration du champ global
@@ -19,6 +21,10 @@ namespace ApiAccess.Controllers
         {
             _connectionString = config.GetConnectionString("MaBaseAccess")!;
         }
+    #endregion
+
+# region POSTS
+        
         [HttpPost("ajout")]
         public IActionResult AjouterValeur([FromBody] AjoutRequest req)
         {
@@ -40,7 +46,7 @@ namespace ApiAccess.Controllers
             return Ok("En développement !!!");
             //return Ok("Ajout réussi");
         }
-
+    
         [HttpPost("{niveau}")]
         public IActionResult AjouterValeur(int niveau, [FromBody] string valeur){
             Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}) VALEUR ({valeur})");
@@ -84,6 +90,16 @@ namespace ApiAccess.Controllers
             }
         }
 
+        [HttpPost("filtre/donnees")]
+        public bool ajouterDonnee(string nom)
+        {
+            Console.Write("Dans GetNiveau_1" + Environment.NewLine);
+            return false;
+        }
+# endregion
+
+# region GETS
+
 
         // -----------------------------
         // Retourne une liste de noms selon le niveau demandé
@@ -122,7 +138,6 @@ namespace ApiAccess.Controllers
             return liste;
         }
 
-
         // -----------------------------
         // Retourne la liste des noms usagers
         // -----------------------------
@@ -154,9 +169,9 @@ namespace ApiAccess.Controllers
             return liste;
         }
 
-// -----------------------------
-// Retourne l'ID associé à un nom
-// -----------------------------
+        // -----------------------------
+        // Retourne l'ID associé à un nom
+        // -----------------------------
         [HttpGet("id-par-nom/{unNom}/{niveau}")]
         public int GetIdSpecifique(string unNom, int niveau){
             Console.WriteLine("Dans GetIdSpecifique pour " + unNom + " Niveau " + niveau);
@@ -168,7 +183,6 @@ namespace ApiAccess.Controllers
 
             return leniveau;
         }
-        
         // -----------------------------
         // 2️⃣ Nouvelle méthode : FiltreNiveau 1
         // -----------------------------
@@ -189,13 +203,42 @@ namespace ApiAccess.Controllers
             liste.Add(idNivo1.ToString());
             return liste;
         }
+       
 
-        [HttpPost("filtre/donnees")]
-        public bool ajouterDonnee(string nom)
+        // -----------------------------
+        // 2️⃣ Nouvelle méthode : détails d’un nom
+        // -----------------------------
+        [HttpGet("details/{nom}")]
+        public IActionResult GetDetails(string nom)
         {
-            Console.Write("Dans GetNiveau_1" + Environment.NewLine);
-            return false;
-        }
+            //int idNom = ObtenirId("tblNiveau1",nom, connectionString);
+
+            using var conn = new OleDbConnection(_connectionString);
+            string sql = "SELECT Nom, Adresse, Telephone, Age FROM tblNoms WHERE Nom = @nom";
+            conn.Open();
+
+            using var cmd = new OleDbCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@nom", nom);            
+
+            using var reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                var result = new
+                {
+                    Nom = reader["Nom"].ToString(),
+                    Adresse = reader["Adresse"].ToString(),
+                    Telephone = reader["Telephone"].ToString(),
+                    Age = reader["Age"].ToString()
+                };
+
+                return Ok(result);
+            }
+
+            return NotFound($"Aucun enregistrement trouvé pour : {nom}"); 
+        }     
+# endregion
+
 #region méthodes privées
         ///<summary>
         /// Retourne le dernier Id de la table mentionn/e
@@ -314,8 +357,8 @@ namespace ApiAccess.Controllers
             };
             return table;
         }
-
-        #region Les INSERTS
+#endregion
+#region Les INSERTS
         private bool AjoutValeurDansTable(int niveau, string lavaleur, Personne lapersonne){
             Console.WriteLine("=== Dans AjoutValeurDansTable ===");
             string latableRef;
@@ -390,8 +433,7 @@ namespace ApiAccess.Controllers
             }
         }
 
-        private void AjoutIdsDansTableLiaison(string leLien,  Personne lapersonne, int idRef, int niveau, OleDbConnection conn, OleDbTransaction transaction)
-        {
+        private void AjoutIdsDansTableLiaison(string leLien,  Personne lapersonne, int idRef, int niveau, OleDbConnection conn, OleDbTransaction transaction){
             Console.WriteLine("Dans AjoutIdsDansTableLiaison");
             // on écrira le Idref (IdNom) et le Personne.idpersonne
            
@@ -498,41 +540,8 @@ namespace ApiAccess.Controllers
     }
         
         
-        #endregion
-
-
 #endregion
-        // -----------------------------
-        // 2️⃣ Nouvelle méthode : détails d’un nom
-        // -----------------------------
-        [HttpGet("details/{nom}")]
-        public IActionResult GetDetails(string nom)
-        {
-            //int idNom = ObtenirId("tblNiveau1",nom, connectionString);
 
-            using var conn = new OleDbConnection(_connectionString);
-            string sql = "SELECT Nom, Adresse, Telephone, Age FROM tblNoms WHERE Nom = @nom";
-            conn.Open();
-
-            using var cmd = new OleDbCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@nom", nom);            
-
-            using var reader = cmd.ExecuteReader();
-
-            if (reader.Read())
-            {
-                var result = new
-                {
-                    Nom = reader["Nom"].ToString(),
-                    Adresse = reader["Adresse"].ToString(),
-                    Telephone = reader["Telephone"].ToString(),
-                    Age = reader["Age"].ToString()
-                };
-
-                return Ok(result);
-            }
-
-            return NotFound($"Aucun enregistrement trouvé pour : {nom}"); 
-        }        
+           
     }
 }
