@@ -12,6 +12,13 @@ namespace ApiAccess.Controllers
     [Route("[controller]")]
     public class DonneesController : ControllerBase
     {
+        // 1️⃣ Déclaration du champ global
+        private readonly string _connectionString;
+        // 👉 CONSTRUCTEUR AJOUTÉ ICI
+        public DonneesController(IConfiguration  config)
+        {
+            _connectionString = config.GetConnectionString("MaBaseAccess")!;
+        }
         [HttpPost("ajout")]
         public IActionResult AjouterValeur([FromBody] AjoutRequest req)
         {
@@ -39,39 +46,13 @@ namespace ApiAccess.Controllers
             Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}) VALEUR ({valeur})");
             //return Ok("Ajout réussi");
             bool succes = false;
-            bool nompresent = false;
+            //bool nompresent = false;
 
             try
             {
                 if (string.IsNullOrWhiteSpace(valeur))
                     return BadRequest("La valeur ne peut pas être vide.");
 
-                //Console.WriteLine($"Dans AjouterValeur, NIVEAU ({niveau}), valeur = {valeur}");
-                //Vérifier si la valeur est présente dans la table du niveau
-                //nompresent = IsNomPresent(niveau, valeur);
-
-                // sélection du niveau d'ajout
-                /*
-                if(niveau == 0){
-                    if!(IsNomPresent(niveau, valeur)){
-                        //je l'ajoute à la table nom
-                        succes = AjoutValeurDansTable("tblNoms",valeur);
-                    }
-                    else{
-                        return StatusCode(10, valeur +  " existe deja dans dans la base de données.");
-                    }
-                }
-                else{ // Niveau 1, 2, ou 3
-                //private bool AjoutValeurDansTable(string latable, string lavaleur){
-                succes = AjoutValeurDansTable("tblNiveau" + Niveau.ToString(),valeur);
-
-                }
-
-*/
-                
-                //Console.WriteLine($"Success = " + succes.ToString());
-                
-                
                 if(IsNomPresent(niveau, valeur)){
                     Console.WriteLine(valeur+ " existe deja dans la base de données.");
                     return StatusCode(10, valeur +  " existe deja dans dans la base de données.");
@@ -91,7 +72,6 @@ namespace ApiAccess.Controllers
 
                 if (!succes){
                     // 
-
                     Console.WriteLine($"Échec de l'ajout dans la base de données.");
                     return StatusCode(500, "Échec de l'ajout dans la base de données.");
                 }                
@@ -102,12 +82,7 @@ namespace ApiAccess.Controllers
             {
                 return StatusCode(500, $"Erreur serveur : {ex.Message}");
             }
-            
-            
         }
-
-
-
 
 
         // -----------------------------
@@ -120,10 +95,8 @@ namespace ApiAccess.Controllers
 
             var liste = new List<string>();
 
-            string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-
-            using var conn = new OleDbConnection(connectionString);
+           
+            using var conn = new OleDbConnection(_connectionString);
             conn.Open();
 
             // 🔥 Construire la requête selon le niveau demandé
@@ -159,11 +132,8 @@ namespace ApiAccess.Controllers
             Console.Write("Dans GetNivo0" + Environment.NewLine);
             var liste = new List<string>();
 
-            string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-
-            using var conn = new OleDbConnection(connectionString);
-            Console.Write(connectionString + Environment.NewLine);
+            using var conn = new OleDbConnection(_connectionString);
+            Console.Write(_connectionString + Environment.NewLine);
 
             conn.Open();
 
@@ -179,8 +149,7 @@ namespace ApiAccess.Controllers
                 liste.Add(reader.GetString(0));
             }
             Console.Write("Après lecture" + Environment.NewLine);
-            Console.Write(string.Join(", ", liste));
-            
+            Console.Write(string.Join(", ", liste));            
 
             return liste;
         }
@@ -192,11 +161,9 @@ namespace ApiAccess.Controllers
         public int GetIdSpecifique(string unNom, int niveau){
             Console.WriteLine("Dans GetIdSpecifique pour " + unNom + " Niveau " + niveau);
             // ici, je veux lire la bd et obtenir l'ID de unNom
-            string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-
+            
             int leniveau = 0;
-            leniveau = ObtenirId("tblNoms",unNom,connectionString);
+            leniveau = ObtenirId("tblNoms",unNom);
             Console.WriteLine("  L'id' est " + leniveau);
 
             return leniveau;
@@ -209,17 +176,13 @@ namespace ApiAccess.Controllers
         public IEnumerable<string> GetNiveau_1(string nom)
         {
             var liste = new List<string>();
-            Console.Write("Dans GetNiveau_1" + Environment.NewLine);
-            
-            string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-            Console.Write(connectionString + Environment.NewLine);
+            Console.Write("Dans GetNiveau_1" + Environment.NewLine); 
             
             string nomlocal = "";
             nomlocal=nom;
             int idNivo1 = 0;
-            Console.Write(connectionString + Environment.NewLine);
-            idNivo1 = ObtenirId("tblNoms", nom, connectionString);
+            Console.Write(_connectionString + Environment.NewLine);
+            idNivo1 = ObtenirId("tblNoms", nom);
             Console.Write("ObtenirId = " + idNivo1.ToString()  + Environment.NewLine);
 
             // Obtenir la liste de tous les éléments de niveau 1 pour le nom sélectionné
@@ -238,15 +201,14 @@ namespace ApiAccess.Controllers
         /// Retourne le dernier Id de la table mentionn/e
         /// </summary>
         /// <param name="table"></param>
-        /// <param name="connectionstring"></param>
         /// <returns>Le dernier Id</returns>
-        private int ObtenirDernierId(string table, string nom, string connectionstring){
+        private int ObtenirDernierId(string table, string nom){
             Console.Write("Dans ObtenirDernierId" + Environment.NewLine);
             string sql = "SELECT MAX([Id]) FROM " + table;
 
             Console.Write("sql = " + sql + Environment.NewLine);
 
-            using var conn = new OleDbConnection(connectionstring);
+            using var conn = new OleDbConnection(_connectionString);
             conn.Open();
             using var cmd = new OleDbCommand(sql, conn);
             object? result = cmd.ExecuteScalar();
@@ -265,13 +227,13 @@ namespace ApiAccess.Controllers
         /// <param name="nom"></param>
         /// <param name="connectionstring"></param>
         /// <returns></returns>
-        private int ObtenirId(string table, string nom, string connectionstring)
+        private int ObtenirId(string table, string nom)
         {
             Console.Write("Dans ObtenirId" + Environment.NewLine);
             Console.Write("table = " + table+ "; nom = " + nom  + Environment.NewLine);
             //Console.Write("nom = " + nom  + Environment.NewLine);
-            //Console.Write("connexionstring = " + connectionstring  + Environment.NewLine);
-            using var conn = new OleDbConnection(connectionstring);
+            //Console.Write("connexionstring = " + _connectionString  + Environment.NewLine);
+            using var conn = new OleDbConnection(_connectionString);
             conn.Open();
 
             string sql = "SELECT [Id] FROM " + table + " WHERE Nom = ?";   
@@ -305,13 +267,10 @@ namespace ApiAccess.Controllers
                 _ => throw new ArgumentException("Niveau invalide")
             };
             Console.Write(sql + Environment.NewLine);
-
-            string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-
+            
             try
             {
-                using var conn = new OleDbConnection(connectionString);
+                using var conn = new OleDbConnection(_connectionString);
                 conn.Open();
                 using var cmd = new OleDbCommand(sql, conn);
                 //using var reader = cmd.ExecuteReader();
@@ -361,8 +320,6 @@ namespace ApiAccess.Controllers
             Console.WriteLine("=== Dans AjoutValeurDansTable ===");
             string latableRef;
             string leLien;
-            string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
 
             Console.WriteLine("niveau =" + niveau);            
 
@@ -381,15 +338,14 @@ namespace ApiAccess.Controllers
             Console.WriteLine("L'Ajout sera dans la table = " + latableRef);
             Console.WriteLine("La table de lisaison sera  = " + leLien);
             Console.WriteLine("Niveau_0  = " + lapersonne.Niveau0 + "; Niveau_1 = " + lapersonne .Niveau1+ "; Niveau_2 = " + lapersonne .Niveau2+ "; Niveau_3 = " + lapersonne .Niveau3);
-            OleDbConnection conn = new OleDbConnection(connectionString);
-            
-                    
+            OleDbConnection conn = new OleDbConnection(_connectionString);
+                                
             try
             {
                 if(!IsNomPresent(niveau, lavaleur)){
                     Console.WriteLine("=== IsNomPresent est faux");
                     // obtenir le dernier id du lien ajouter 1
-                    int IdRef = ObtenirDernierId(latableRef, "", connectionString) + 1;
+                    int IdRef = ObtenirDernierId(latableRef, "") + 1;
                     Console.WriteLine("=== Id pour la nouvelle valeur " + lavaleur + " est " + IdRef);
                     // Id == 0, pas dans la table et en plus la table est vide.  
                     conn.Open();
@@ -420,41 +376,17 @@ namespace ApiAccess.Controllers
                 else{ //Le nom existe j'ai besoin de son Id
                     Console.WriteLine("=== Dans le else de !IsNomPresent de AjoutValeurDansTable()");
                     Console.WriteLine("=== La valeur est présente, on ajoutera simplement les liens dans la tble de liaison");
-                    int idNom = ObtenirId(latableRef,lavaleur, connectionString);
+                    int idNom = ObtenirId(latableRef,lavaleur);
 
                     //Console.WriteLine("=== Id pour la nouvelle valeur " + lavaleur + " est " + idNom);
                     // obtenir le dernier id du lien
-                }
-                
-/*
-                int parentId;
+                }                
 
-                // INSERT parent
-                using (var cmd1 = new OleDbCommand("INSERT INTO " + latable + " (Nom) VALUES (?)", conn, transaction))
-                {
-                   cmd1.Parameters.AddWithValue("@p1", leLien = ObtenirNomTableLienParNiveau(niveau));
-                    //cmd1.ExecuteNonQuery();
-
-                    cmd1.CommandText = "SELECT @@IDENTITY";
-                    parentId = Convert.ToInt32(cmd1.ExecuteScalar());
-                }
-
-                // INSERT enfant
-                using (var cmd2 = new OleDbCommand("INSERT INTO tblEnfant (ParentID, Valeur) VALUES (?, ?)", conn, transaction))
-                {
-                    cmd2.Parameters.AddWithValue("@p1", parentId);
-                    cmd2.Parameters.AddWithValue("@p2", lavaleur);
-                    //cmd2.ExecuteNonQuery();
-                }
-
-                transaction.Commit();
-                */
                 return true;
             }
             catch (Exception ex)
             {                
                 throw;
-                //return false;
             }
         }
 
@@ -462,16 +394,14 @@ namespace ApiAccess.Controllers
         {
             Console.WriteLine("Dans AjoutIdsDansTableLiaison");
             // on écrira le Idref (IdNom) et le Personne.idpersonne
-            //string connectionString =
-             //   @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-            
+           
             try
             {
                 Console.WriteLine("La table : " + leLien  + ", Id Niveau 0 :" + lapersonne.Niveau0 + ", IdRef :" + idRef);
                 // créer le insert ici
                 string sql = $"INSERT INTO {leLien} (IdNiveau0, IdNiveau1) VALUES (?, ?)";
                 Console.WriteLine("SQL = " + sql);
-                //using var conn = new OleDbConnection(connectionString);
+                //using var conn = new OleDbConnection(_connectionString);
                 //conn.Open();
                 using var cmd = new OleDbCommand(sql, conn, transaction);
                 cmd.Parameters.AddWithValue("@p1", lapersonne.Niveau0);
@@ -491,8 +421,7 @@ namespace ApiAccess.Controllers
             Console.WriteLine("Dans AjoutValeurDansTable avec " + leID + " , " + lavaleur);
             
             try{
-                //string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-            
+               
                 string sql = $"INSERT INTO {latable} (Id, Nom) VALUES (?, ?)";
                 
                 Console.WriteLine("SQL = " + sql);
@@ -512,8 +441,7 @@ namespace ApiAccess.Controllers
             }
             catch(Exception ex){
                 Console.WriteLine("Erreur SQL : " + ex.Message);
-                throw;
-                
+                throw;                
             }
             //return false;
     }
@@ -525,15 +453,10 @@ namespace ApiAccess.Controllers
             }           
 
             try{
-                string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-
-                // Ouvrir une transaction
-            
                 string sql = $"INSERT INTO {latable} (Nom) VALUES (?)";
                 
                 Console.WriteLine("SQL = " + sql);
-                using var conn = new OleDbConnection(connectionString);
+                using var conn = new OleDbConnection(_connectionString);
                 
                 conn.Open();
                 using var cmd = new OleDbCommand(sql, conn);
@@ -546,7 +469,6 @@ namespace ApiAccess.Controllers
                 Console.WriteLine("Erreur SQL : " + ex.Message);
                 return false;
             }
-
         return true;
     }
     private bool AjouterDansTablerUsagers(string lavaleur){
@@ -555,13 +477,11 @@ namespace ApiAccess.Controllers
         string latable = "tblNoms";
         retour = true;
         try{
-                string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-                //int dernierid = ObtenirDernierId(latable, lavaleur, connectionString);
+                //int dernierid = ObtenirDernierId(latable, lavaleur);
                 string sql = $"INSERT INTO {latable} (Nom) VALUES (?)";
                 
                 Console.WriteLine("SQL = " + sql);
-                using var conn = new OleDbConnection(connectionString);
+                using var conn = new OleDbConnection(_connectionString);
                 
                 conn.Open();
                 using var cmd = new OleDbCommand(sql, conn);
@@ -588,12 +508,9 @@ namespace ApiAccess.Controllers
         [HttpGet("details/{nom}")]
         public IActionResult GetDetails(string nom)
         {
-            string connectionString =
-                @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=\\Desktop-riddror\D\Developpements\VsCode\ApiAccess\ApiAccess\Base\API_DB_01.accdb;";
-
             //int idNom = ObtenirId("tblNiveau1",nom, connectionString);
 
-            using var conn = new OleDbConnection(connectionString);
+            using var conn = new OleDbConnection(_connectionString);
             string sql = "SELECT Nom, Adresse, Telephone, Age FROM tblNoms WHERE Nom = @nom";
             conn.Open();
 
