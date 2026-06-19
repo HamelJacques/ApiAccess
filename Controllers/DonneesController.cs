@@ -119,8 +119,8 @@ namespace ApiAccess.Controllers
             string sql = niveau switch
             {
                 0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
-                1 => "SELECT Nom FROM tblNiveau_1 ORDER BY Nom",
-                2 => "SELECT Nom FROM tblNiveau_2 ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
+                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             Console.WriteLine($"SQL = {sql}");
@@ -305,8 +305,8 @@ namespace ApiAccess.Controllers
             string sql = nivo switch
             {
                 0 => "SELECT COUNT(Nom) FROM tblNoms WHERE Nom = '" + valeur + "'",
-                1 => "SELECT COUNT(Nom) FROM tblNiveau_1 WHERE Nom = '" + valeur + "'",
-                2 => "SELECT Nom FROM tblNiveau_2 ORDER BY Nom",
+                1 => "SELECT COUNT(Nom) FROM tblNiveau1 WHERE Nom = '" + valeur + "'",
+                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             Console.Write(sql + Environment.NewLine);
@@ -339,9 +339,9 @@ namespace ApiAccess.Controllers
             string table = niveau switch
             {
                 0 => "tblNoms",
-                1 => "tblNiveau_1",
-                2 => "tblNiveau_2",
-                3 => "tblNiveau_3",
+                1 => "tblNiveau1",
+                2 => "tblNiveau2",
+                3 => "tblNiveau3",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             
@@ -363,6 +363,7 @@ namespace ApiAccess.Controllers
             Console.WriteLine("=== Dans AjoutValeurDansTable ===");
             string latableRef;
             string leLien;
+            bool reussite = false;
 
             Console.WriteLine("niveau =" + niveau);            
 
@@ -409,11 +410,14 @@ namespace ApiAccess.Controllers
                         AjoutIdsDansTableLiaison(leLien, lapersonne, IdRef, niveau, conn, transaction); // méthode à créer 
                         transaction.Commit();
                         conn.Close();
+                        reussite= true;
                     }
                     catch(Exception ex)
                     {
                         Console.WriteLine("ERREUR LORS DE L'AJOUT D'UNE NOUVELLE VALEUR DE RÉFÉRENCE : " + Environment.NewLine + ex.Message);
                         transaction.Rollback();
+                        Console.WriteLine("Réussite est " + reussite);
+                        return reussite;
                     }
                 }
                 else{ //Le nom existe j'ai besoin de son Id
@@ -423,17 +427,19 @@ namespace ApiAccess.Controllers
 
                     //Console.WriteLine("=== Id pour la nouvelle valeur " + lavaleur + " est " + idNom);
                     // obtenir le dernier id du lien
+                    return reussite;
                 }                
 
-                return true;
+                //return true;
             }
             catch (Exception ex)
             {                
                 throw;
             }
+            return true;
         }
 
-        private void AjoutIdsDansTableLiaison(string leLien,  Personne lapersonne, int idRef, int niveau, OleDbConnection conn, OleDbTransaction transaction){
+        private bool AjoutIdsDansTableLiaison(string leLien,  Personne lapersonne, int idRef, int niveau, OleDbConnection conn, OleDbTransaction transaction){
             Console.WriteLine("Dans AjoutIdsDansTableLiaison");
             // on écrira le Idref (IdNom) et le Personne.idpersonne
            
@@ -450,6 +456,7 @@ namespace ApiAccess.Controllers
                 cmd.Parameters.AddWithValue("@p2", idRef);
                 int rows = cmd.ExecuteNonQuery();
                 Console.WriteLine("Rows affected = " + rows);
+                return true;
                 //conn.Close();
             }
             catch(Exception ex){
