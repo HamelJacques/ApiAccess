@@ -103,8 +103,8 @@ namespace ApiAccess.Controllers
             string sql = niveau switch
             {
                 0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
-                1 => "SELECT Nom FROM tblNiveau_1 ORDER BY Nom",
-                2 => "SELECT Nom FROM tblNiveau_2 ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
+                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             Console.WriteLine($"SQL = {sql}");
@@ -262,8 +262,8 @@ namespace ApiAccess.Controllers
             string sql = nivo switch
             {
                 0 => "SELECT COUNT(Nom) FROM tblNoms WHERE Nom = '" + valeur + "'",
-                1 => "SELECT COUNT(Nom) FROM tblNiveau_1 WHERE Nom = '" + valeur + "'",
-                2 => "SELECT Nom FROM tblNiveau_2 ORDER BY Nom",
+                1 => "SELECT COUNT(Nom) FROM tblNiveau1 WHERE Nom = '" + valeur + "'",
+                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             Console.Write(sql + Environment.NewLine);
@@ -296,9 +296,9 @@ namespace ApiAccess.Controllers
             string table = niveau switch
             {
                 0 => "tblNoms",
-                1 => "tblNiveau_1",
-                2 => "tblNiveau_2",
-                3 => "tblNiveau_3",
+                1 => "tblNiveau1",
+                2 => "tblNiveau2",
+                3 => "tblNiveau3",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             
