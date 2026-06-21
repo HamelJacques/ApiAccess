@@ -90,6 +90,20 @@ namespace ApiAccess.Controllers
             }
         }
 
+        [HttpPost("filtre/{niveau}")]
+        public IEnumerable<string> GetNiveauFiltre(int niveau, [FromBody] Personne lapersonne)
+        {
+            Console.WriteLine($"BINGO !!! Dans GetNiveauFiltre({niveau}, {lapersonne?.Niveau0})");
+
+            var liste = new List<string>();
+            liste.Add("aaa");
+            liste.Add("BBB");
+
+            // ... filtrage selon lapersonne ...
+
+            return liste;
+        }
+
         [HttpPost("filtre/donnees")]
         public bool ajouterDonnee(string nom)
         {
