@@ -94,10 +94,26 @@ namespace ApiAccess.Controllers
         public IEnumerable<string> GetNiveauFiltre(int niveau, [FromBody] Personne lapersonne)
         {
             Console.WriteLine($"BINGO !!! Dans GetNiveauFiltre({niveau}, {lapersonne?.Niveau0})");
+            Console.WriteLine(lapersonne);
 
             var liste = new List<string>();
             liste.Add("aaa");
             liste.Add("BBB");
+
+            // Construire un SELECT  nom FROM TABLE join Table on 
+            // WHERE Table.Id =  lapersonne.Niveau0
+            string sql = niveau switch
+            {
+                0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNiveau1 INNER JOIN ON tblNoms on tblNiveau1.Id = tblNiveau1.Id ORDER BY Nom",
+                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
+                _ => throw new ArgumentException("Niveau invalide")
+            };
+            Console.WriteLine($"SQL = {sql}");
+
+            using var conn = new OleDbConnection(_connectionString);
+            conn.Open();
+            conn.Close();
 
             // ... filtrage selon lapersonne ...
 
