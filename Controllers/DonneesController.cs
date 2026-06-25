@@ -105,7 +105,7 @@ namespace ApiAccess.Controllers
             string sql = niveau switch
             {
                 0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
-                1 => "SELECT Nom FROM tblNiveau1 INNER JOIN ON tblNoms on tblNiveau1.Id = tblNiveau1.Id ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNoms INNER JOIN (tblNiveau1 INNER JOIN jctNiveau_0_Niveau_1 ON tblNiveau1.Id = jctNiveau_0_Niveau_1.IdNiveau1) ON tblNoms.Id = jctNiveau_0_Niveau_1.IdNiveau0 WHERE (((tblNoms.Id)=3))",
                 2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
