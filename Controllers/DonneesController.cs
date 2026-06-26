@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Text.Json;
 using ApiAccess.Models;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace ApiAccess.Controllers
@@ -91,9 +92,10 @@ namespace ApiAccess.Controllers
         }
 
         [HttpPost("filtre/{niveau}")]
-        public IEnumerable<string> GetNiveauFiltre(int niveau, [FromBody] Personne lapersonne)
+        public IEnumerable<string> GetNiveauFiltre(int niveau, [FromBody][Required] Personne lapersonne)
         {
-            Console.WriteLine($"BINGO !!! Dans GetNiveauFiltre({niveau}, {lapersonne?.Niveau0})");
+            
+            Console.WriteLine($"BINGO !!! Dans GetNiveauFiltre({niveau}, {lapersonne.Niveau0})");
             Console.WriteLine(lapersonne);
 
             var liste = new List<string>();
@@ -105,15 +107,38 @@ namespace ApiAccess.Controllers
             string sql = niveau switch
             {
                 0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
-                1 => "SELECT Nom FROM tblNoms INNER JOIN (tblNiveau1 INNER JOIN jctNiveau_0_Niveau_1 ON tblNiveau1.Id = jctNiveau_0_Niveau_1.IdNiveau1) ON tblNoms.Id = jctNiveau_0_Niveau_1.IdNiveau0 WHERE (((tblNoms.Id)=3))",
+                1 => "SELECT tblNiveau1.Nom FROM tblNoms INNER JOIN (tblNiveau1 INNER JOIN jctNiveau_0_Niveau_1 ON tblNiveau1.Id = jctNiveau_0_Niveau_1.IdNiveau1) ON tblNoms.Id = jctNiveau_0_Niveau_1.IdNiveau0",
                 2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
+            
+            string szWHERE = lapersonne.Niveau0 switch
+            {                
+                0 => szWHERE = "",
+                1 => szWHERE = " WHERE (((tblNoms.Id)=1))",
+                2 => szWHERE = " WHERE (((tblNoms.Id)=2))",
+                3 => szWHERE = " WHERE (((tblNoms.Id)=3))",
+                _ => throw new ArgumentException("Niveau invalide")
+            };
+
+            sql += szWHERE;
+
             Console.WriteLine($"SQL = {sql}");
+            liste = new List<string>();
 
             using var conn = new OleDbConnection(_connectionString);
             conn.Open();
+
+            using var cmd = new OleDbCommand(sql, conn);
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                liste.Add(reader.GetString(0));
+            }
+
             conn.Close();
+            Console.WriteLine(string.Join(", ", liste));
 
             // ... filtrage selon lapersonne ...
 
