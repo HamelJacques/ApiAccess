@@ -231,9 +231,9 @@ namespace ApiAccess.Controllers
         public int GetIdSpecifique(string unNom, int niveau){
             Console.WriteLine("Dans GetIdSpecifique pour " + unNom + " Niveau " + niveau);
             // ici, je veux lire la bd et obtenir l'ID de unNom
-            
+ 
             int leniveau = 0;
-            leniveau = ObtenirId("tblNoms",unNom);
+            leniveau = ObtenirId(this.ObtenirNomTableParNiveau(niveau),unNom);
             Console.WriteLine("  L'id' est " + leniveau);
 
             return leniveau;
@@ -351,7 +351,7 @@ namespace ApiAccess.Controllers
                 return id;
             }
 
-            return -1; // ou -1 selon ta logique
+            return 0; // ou -1 selon ta logique
         }
 
         private bool IsNomPresent(int nivo, string valeur){
