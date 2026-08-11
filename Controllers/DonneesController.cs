@@ -94,7 +94,8 @@ namespace ApiAccess.Controllers
         [HttpPost("filtre/{niveau}")]
         public IEnumerable<string> GetNiveauFiltre(int niveau, [FromBody][Required] Personne lapersonne)
         {
-            
+            //chemaReader.LireChamps(_connectionString,"jctNiveau_1_Niveau_2");
+   
             Console.WriteLine($"BINGO !!! Dans GetNiveauFiltre({niveau}, {lapersonne.Niveau0})");
             Console.WriteLine(lapersonne);
 
@@ -415,7 +416,7 @@ namespace ApiAccess.Controllers
 #endregion
 #region Les INSERTS
         private bool AjoutValeurDansTable(int niveau, string lavaleur, Personne lapersonne){
-            Console.WriteLine("=== Dans AjoutValeurDansTable ===");
+            Console.WriteLine("=== Dans AjoutValeurDansTable ===" + Environment.NewLine);
             string latableRef;
             string leLien;
             bool reussite = false;
@@ -497,12 +498,21 @@ namespace ApiAccess.Controllers
         private bool AjoutIdsDansTableLiaison(string leLien,  Personne lapersonne, int idRef, int niveau, OleDbConnection conn, OleDbTransaction transaction){
             Console.WriteLine("Dans AjoutIdsDansTableLiaison");
             // on écrira le Idref (IdNom) et le Personne.idpersonne
-           
+
+            // J'ai besoin de lire le schéma de la table de liaison pour extraire les noms de champs
+            List<string> lst = new List<string> ();
+            lst = SchemaReader.LireChamps(_connectionString, "jctNiveau_1_Niveau_2");
+            Console.WriteLine(" ... Noms champs");
+            Console.WriteLine(string.Join(", ", lst));
+            Console.WriteLine(" ... param1 : " + lapersonne.Niveau1);
+            Console.WriteLine(" ... param2 : " + lapersonne.Niveau2);
+
             try
             {
                 Console.WriteLine("La table : " + leLien  + ", Id Niveau 0 :" + lapersonne.Niveau0 + ", IdRef :" + idRef);
                 // créer le insert ici
-                string sql = $"INSERT INTO {leLien} (IdNiveau0, IdNiveau1) VALUES (?, ?)";
+                // 
+                string sql = $"INSERT INTO {leLien} (lst(0), lst(1)) VALUES (?, ?)";
                 Console.WriteLine("SQL = " + sql);
                 //using var conn = new OleDbConnection(_connectionString);
                 //conn.Open();
