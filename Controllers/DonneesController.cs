@@ -519,7 +519,7 @@ namespace ApiAccess.Controllers
                 //conn.Open();
                 using var cmd = new OleDbCommand(sql, conn, transaction);
                 cmd.Parameters.AddWithValue("@p1", lapersonne.Niveau0);
-                cmd.Parameters.AddWithValue("@p2", idRef);
+                cmd.Parameters.AddWithValue("@p2", newId);
                 int rows = cmd.ExecuteNonQuery();
                 Console.WriteLine("Rows affected = " + rows);
                 return true;
