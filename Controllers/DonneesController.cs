@@ -24,8 +24,7 @@ namespace ApiAccess.Controllers
         }
     #endregion
 
-# region POSTS
-        
+# region POSTS 
         [HttpPost("ajout")]
         public IActionResult AjouterValeur([FromBody] AjoutRequest req)
         {
@@ -91,6 +90,7 @@ namespace ApiAccess.Controllers
             }
         }
 
+// Changer pour un GET
         [HttpPost("filtre/{niveau}")]
         public IEnumerable<string> GetNiveauFiltre(int niveau, [FromBody][Required] Personne lapersonne)
         {
