@@ -161,37 +161,42 @@ namespace ApiAccess.Controllers
         // Retourne une liste de noms selon le niveau demandé
         // -----------------------------
         [HttpGet("{niveau}")]
-        public IEnumerable<string> GetNiveau(int niveau)
+        public IActionResult GetNiveau(int niveau)
         {
             Console.WriteLine($"Dans GetNiveau({niveau})");
-
-            var liste = new List<string>();
-
-           
-            using var conn = new OleDbConnection(_connectionString);
-            conn.Open();
-
-            // 🔥 Construire la requête selon le niveau demandé
-            string sql = niveau switch
+            try
             {
-                0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
-                1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
-                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
-                _ => throw new ArgumentException("Niveau invalide")
-            };
-            Console.WriteLine($"SQL = {sql}");
+                var liste = new List<string>();
+                // 🔥 Construire la requête selon le niveau demandé
+                string? sql = niveau switch
+                {
+                    0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
+                    1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
+                    2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
+                    _=> null!
+                };
+                Console.WriteLine($"SQL = {sql}");
+                if (sql == null)
+                    return BadRequest($"Niveau {niveau} invalide.");
 
-            using var cmd = new OleDbCommand(sql, conn);
-            using var reader = cmd.ExecuteReader();
+                    using var conn = new OleDbConnection(_connectionString);
+                    conn.Open();
 
-            while (reader.Read())
+                    using var cmd = new OleDbCommand(sql, conn);
+                    using var reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        liste.Add(reader.GetString(0));
+                    }
+                    Console.WriteLine("Résultat : " + string.Join(", ", liste));
+                    return Ok(liste); // même si liste vide
+            }
+            catch (Exception ex)
             {
-                liste.Add(reader.GetString(0));
+                return StatusCode(500, $"Erreur serveur : {ex.Message}");
             }
 
-            Console.WriteLine("Résultat : " + string.Join(", ", liste));
-
-            return liste;
         }
 
         // -----------------------------
