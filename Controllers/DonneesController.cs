@@ -103,8 +103,8 @@ namespace ApiAccess.Controllers
             string sql = niveau switch
             {
                 0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
-                1 => "SELECT Nom FROM tblNiveau_1 ORDER BY Nom",
-                2 => "SELECT Nom FROM tblNiveau_2 ORDER BY Nom",
+                1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
+                2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
                 _ => throw new ArgumentException("Niveau invalide")
             };
             Console.WriteLine($"SQL = {sql}");
