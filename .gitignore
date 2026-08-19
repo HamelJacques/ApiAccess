@@ -1,0 +1,26 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Build results
+bin/
+obj/
+*.dll
+*.pdb
+*.cache
+*.exe
+
+# Visual Studio
+.vs/
+
+# User-specific files
+*.user
+*.suo
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+packages/
+
+# Access database
+*.accdb
+*.laccdb

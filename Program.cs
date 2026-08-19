@@ -1,5 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular",
@@ -13,9 +15,19 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 
-var app = builder.Build();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+});
 
-app.UseCors("AllowAngular");
+var app = builder.Build();
+app.UseHttpsRedirection();
+app.UseCors("AllowAll");
+
+//app.UseCors("AllowAngular");
 
 app.MapControllers();
 
