@@ -92,11 +92,7 @@ namespace ApiAccess.Controllers
         public IActionResult GetNiveau(int niveau)
         {
             Console.WriteLine($"Dans GetNiveau({niveau})");
-            try{
-                using var conn = new OleDbConnection(_connectionString);
-                conn.Open();
-
-                // 🔥 Construire la requête selon le niveau demandé
+            // 🔥 Construire la requête selon le niveau demandé
                 string sql = niveau switch
                 {
                     0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
@@ -108,6 +104,12 @@ namespace ApiAccess.Controllers
                 if (sql is null)
                     return BadRequest($"Niveau {niveau} invalide.");
 
+            try{
+                using var conn = new OleDbConnection(_connectionString);
+                conn.Open();
+
+                
+
                 var liste = new List<string>();
                 
                 using var cmd = new OleDbCommand(sql, conn);
@@ -117,6 +119,7 @@ namespace ApiAccess.Controllers
                 {
                     liste.Add(reader.GetString(0));
                 }
+                Console.WriteLine("");
                 Console.WriteLine($"Liste longeur = {liste.Count}");
                 return Ok(liste); // même si liste vide
             }
