@@ -20,7 +20,6 @@ namespace ApiAccess.Controllers
             _connectionString = config.GetConnectionString("MaBaseAccess")!;
         }
 
-#region POSTS
         
         [HttpPost("ajout")]
         public IActionResult AjouterValeur([FromBody] AjoutRequest req)
@@ -92,8 +91,7 @@ namespace ApiAccess.Controllers
             Console.Write("Dans GetNiveau_1" + Environment.NewLine);
             return false;
         }
-#region 
-#region GET
+
     
         // -----------------------------
         // Retourne une liste de noms selon le niveau demandé
@@ -140,7 +138,7 @@ namespace ApiAccess.Controllers
             
         }
 
-#endregion
+
         // -----------------------------
         // Retourne la liste des noms usagers
         // -----------------------------
@@ -188,16 +186,52 @@ namespace ApiAccess.Controllers
         }
         
         // -----------------------------
-        // 2️⃣ Nouvelle méthode : FiltreNiveau 1
+        // 2️⃣ Nouvelle méthode : FiltreNiveau x
         // -----------------------------
-        [HttpGet("filtre/nom")]        
-        public IEnumerable<string> GetNiveau_1(string nom)
+        [HttpGet("filtre/nom{niveau}/{nom}")]        
+        public IActionResult GetNiveau(int niveau, string nom)
         {
             var liste = new List<string>();
             Console.Write("Dans GetNiveau_1" + Environment.NewLine); 
+            Console.WriteLine($"Filtre niveau {niveau} pour le nom : {nom}");
             
-            string nomlocal = "";
-            nomlocal=nom;
+            // 🔥 Construire la requête selon le niveau demandé
+            string sql = niveau switch
+            {
+                0 => @"SELECT tblNoms.Nom FROM tblNoms WHERE tblNoms.Nom = ?
+    ",
+                1 => @" SELECT tblNiveau1.Nom FROM tblNiveau1
+                        INNER JOIN jctNiveau_0_Niveau_1  ON tblNiveau1.Id = jctNiveau_0_Niveau_1.IdNiveau1
+                        INNER JOIN tblNoms  ON tblNoms.Id = jctNiveau_0_Niveau_1.IdNiveau0
+                        WHERE tblNoms.Nom = ?",
+                2 => @"SELECT tblNiveau2.Nom FROM tblNiveau2
+                        INNER JOIN jctNiveau_1_Niveau_2  ON tblNiveau2.Id = jctNiveau_1_Niveau_2.IdNiveau2
+                        INNER JOIN tblNiveau1 ON tblNiveau1.Id = jctNiveau_1_Niveau_2.IdNiveau1
+                        WHERE tblNiveau1.Nom = ?
+                _ => null!",
+            };
+
+            
+            Console.WriteLine(sql);
+
+            try{
+                using var conn = new OleDbConnection(_connectionString);
+                conn.Open();
+                using var cmd = new OleDbCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@nom", nom);
+                using var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    liste.Add(reader.GetString(0));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
             int idNivo1 = 0;
             Console.Write(_connectionString + Environment.NewLine);
             idNivo1 = ObtenirId("tblNoms", nom);
@@ -205,11 +239,11 @@ namespace ApiAccess.Controllers
 
             // Obtenir la liste de tous les éléments de niveau 1 pour le nom sélectionné
             liste.Add(idNivo1.ToString());
-            return liste;
+            return Ok(liste);
         }
 
         
-#region méthodes privées
+
         ///<summary>
         /// Retourne le dernier Id de la table mentionnée
         /// </summary>
@@ -328,7 +362,7 @@ namespace ApiAccess.Controllers
             return table;
         }
 
-        #region Les INSERTS
+
         private bool AjoutValeurDansTable(int niveau, string lavaleur, Personne lapersonne){
             Console.WriteLine("=== Dans AjoutValeurDansTable ===");
             string latableRef;
@@ -511,10 +545,8 @@ namespace ApiAccess.Controllers
     }
         
         
-        #endregion
 
 
-#endregion
         // -----------------------------
         // 2️⃣ Nouvelle méthode : détails d’un nom
         // -----------------------------
@@ -546,6 +578,7 @@ namespace ApiAccess.Controllers
             }
 
             return NotFound($"Aucun enregistrement trouvé pour : {nom}"); 
-        }        
-    }
+        }    
+    }    
 }
+ 
