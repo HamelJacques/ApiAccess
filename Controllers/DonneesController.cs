@@ -19,6 +19,9 @@ namespace ApiAccess.Controllers
         {
             _connectionString = config.GetConnectionString("MaBaseAccess")!;
         }
+
+#region POSTS
+        
         [HttpPost("ajout")]
         public IActionResult AjouterValeur([FromBody] AjoutRequest req)
         {
@@ -37,8 +40,7 @@ namespace ApiAccess.Controllers
             // traitement...
             bool ajoutOk =  this.AjoutValeurDansTable(ajoutpourniveau,valeur, personne);
 
-            return Ok("En développement !!!");
-            //return Ok("Ajout réussi");
+            return Ok("Ajout réussi !!!");
         }
 
         [HttpPost("{niveau}")]
@@ -84,7 +86,15 @@ namespace ApiAccess.Controllers
             }
         }
 
-
+        [HttpPost("filtre/donnees")]
+        public bool ajouterDonnee(string nom)
+        {
+            Console.Write("Dans GetNiveau_1" + Environment.NewLine);
+            return false;
+        }
+#region 
+#region GET
+    
         // -----------------------------
         // Retourne une liste de noms selon le niveau demandé
         // -----------------------------
@@ -98,7 +108,7 @@ namespace ApiAccess.Controllers
                     0 => "SELECT Nom FROM tblNoms ORDER BY Nom",
                     1 => "SELECT Nom FROM tblNiveau1 ORDER BY Nom",
                     2 => "SELECT Nom FROM tblNiveau2 ORDER BY Nom",
-                    _ => null
+                    _ => null!
                 };
                 Console.WriteLine($"SQL = {sql}");
                 if (sql is null)
@@ -130,7 +140,7 @@ namespace ApiAccess.Controllers
             
         }
 
-
+#endregion
         // -----------------------------
         // Retourne la liste des noms usagers
         // -----------------------------
@@ -198,15 +208,10 @@ namespace ApiAccess.Controllers
             return liste;
         }
 
-        [HttpPost("filtre/donnees")]
-        public bool ajouterDonnee(string nom)
-        {
-            Console.Write("Dans GetNiveau_1" + Environment.NewLine);
-            return false;
-        }
+        
 #region méthodes privées
         ///<summary>
-        /// Retourne le dernier Id de la table mentionn/e
+        /// Retourne le dernier Id de la table mentionnée
         /// </summary>
         /// <param name="table"></param>
         /// <returns>Le dernier Id</returns>
