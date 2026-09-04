@@ -228,7 +228,8 @@ namespace ApiAccess.Controllers
             }
             catch (Exception ex)
             {
-                throw ex;
+                Console.Write(ex.ToString() + Environment.NewLine);
+                throw;
             }
 
 
